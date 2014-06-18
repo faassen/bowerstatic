@@ -6,7 +6,7 @@ from bowerstatic.publisher import FOREVER
 from datetime import datetime, timedelta
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def c():
     bower = bowerstatic.Bower()
 
@@ -97,14 +97,3 @@ def test_different_publisher_signature():
     response = c.get(
         '/static/bower_components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
-
-# def test_tracer_bullet():
-#     bower = bowerstatic.Bower()
-#     bower.add('bower_components', 'bower_components')
-#     def wsgi(env, start_response):
-#         pass
-#     publisher = bower.publisher(wsgi)
-#     injector = bower.injector(publisher)
-
-#     includer = bower.includer('bower_components')
-#     includer()

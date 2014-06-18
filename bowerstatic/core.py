@@ -1,6 +1,8 @@
-from .publisher import Publisher
 import os
 import json
+from .publisher import Publisher
+from .injector import Injector
+from .includer import Includer
 
 
 class Bower(object):
@@ -13,6 +15,9 @@ class Bower(object):
     def add(self, name, path):
         self._components_directories[name] = ComponentsDirectory(name, path)
 
+    def middleware(self, wsgi):
+        return self.publisher(self.injector(wsgi))
+
     def publisher(self, wsgi):
         return Publisher(self, wsgi)
 
@@ -20,7 +25,7 @@ class Bower(object):
         return Injector(self, wsgi)
 
     def includer(self, name):
-        return self._directories[name].includer()
+        return self._components_directories[name].includer(self)
 
     def get_filename(self, bower_components_name,
                      package_name, package_version, file_path):
@@ -39,8 +44,11 @@ class ComponentsDirectory(object):
         self.path = path
         self._packages = load_packages(path)
 
-    def includer(self):
-        return Includer(self)
+    def includer(self, bower):
+        return Includer(bower, self)
+
+    def get_package(self, package_name):
+        return self._packages.get(package_name)
 
     def get_filename(self, package_name, package_version, file_path):
         package = self._packages.get(package_name)
@@ -87,22 +95,3 @@ class Package(object):
         return filename
 
 
-class Resource(object):
-    def __init__(self, name, path):
-        pass
-
-
-class Injector(object):
-    def __init__(self, bower, wsgi):
-        pass
-
-    def __call__(self, environ, start_response):
-        pass
-
-
-class Includer(object):
-    def __init__(self, bower_components):
-        pass
-
-    def __call__(self, path=None):
-        pass
