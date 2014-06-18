@@ -22,7 +22,8 @@ setup(name='bowerstatic',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-        'setuptools',
+          'setuptools',
+          'WebOb',
         ],
       tests_require=tests_require,
       extras_require = dict(
