@@ -8,7 +8,8 @@ from setuptools import setup, find_packages
 
 tests_require = [
     'pytest >= 2.0',
-    'pytest-cov'
+    'pytest-cov',
+    'WebTest >= 2.0.14',
     ]
 
 setup(name='bowerstatic',
