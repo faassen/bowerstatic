@@ -39,6 +39,8 @@ class Publisher(object):
             return webob.exc.HTTPNotFound()
         # the rest of the path goes into package
         file_path = request.path_info.lstrip('/')
+        if file_path.strip() == '':
+            return webob.exc.HTTPNotFound()
         filename = self.bower.get_filename(bower_components_name,
                                            package_name,
                                            package_version,
