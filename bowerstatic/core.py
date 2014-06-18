@@ -32,6 +32,7 @@ class Bower(object):
                                                  package_version,
                                                  file_path)
 
+
 class ComponentsDirectory(object):
     def __init__(self, name, path):
         self.name = name
@@ -97,6 +98,7 @@ class Injector(object):
 
     def __call__(self, environ, start_response):
         pass
+
 
 class Includer(object):
     def __init__(self, bower_components):

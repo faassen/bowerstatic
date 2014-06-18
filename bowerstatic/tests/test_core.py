@@ -2,6 +2,9 @@ import bowerstatic
 from webtest import TestApp as Client
 import os
 import pytest
+from bowerstatic.publisher import FOREVER
+from datetime import datetime, timedelta
+
 
 @pytest.fixture
 def c():
@@ -24,11 +27,17 @@ def test_publisher_passthrough(c):
     response = c.get('/')
     assert response.body == b'Hello!'
 
+
 def test_publisher_serve_files(c):
-    # access bowerstatic files
     response = c.get(
         '/bowerstatic/bower_components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
+    assert response.cache_control.max_age == FOREVER
+    utc = response.expires.tzinfo  # get UTC has a hack
+    # the test has just run and took less than a full day to run
+    # we therefore expect expired to be greater than one_day_ago + FOREVER
+    future = datetime.now(utc) - timedelta(days=1) + timedelta(seconds=FOREVER)
+    assert response.expires >= future
 
     response = c.get(
         '/bowerstatic/bower_components/jquery-ui/1.10.4/ui/jquery-ui.js')
@@ -69,6 +78,26 @@ def test_publisher_no_sneaky_escape(c):
     c.get('/bowerstatic/bower_components/jquery/2.1.1/../../../publisher.py',
           status=404)
 
+
+def test_different_publisher_signature():
+    bower = bowerstatic.Bower(publisher_signature='static')
+
+    bower.add('bower_components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        return ['Hello!']
+
+    publisher = bower.publisher(wsgi)
+
+    c = Client(publisher)
+    response = c.get('/')
+    assert response.body == b'Hello!'
+    response = c.get(
+        '/static/bower_components/jquery/2.1.1/dist/jquery.js')
+    assert response.body == b'/* jquery.js 2.1.1 */\n'
+
 # def test_tracer_bullet():
 #     bower = bowerstatic.Bower()
 #     bower.add('bower_components', 'bower_components')
@@ -79,5 +108,3 @@ def test_publisher_no_sneaky_escape(c):
 
 #     includer = bower.includer('bower_components')
 #     includer()
-
-

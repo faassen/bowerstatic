@@ -47,10 +47,9 @@ class Publisher(object):
                                            file_path)
         if filename is None:
             return webob.exc.HTTPNotFound()
-        file_app = FileApp(
-            filename,
-            expires = time.time() + FOREVER
-        )
+        file_app = FileApp(filename)
         response = request.get_response(file_app)
-        response.cache_control.max_age = FOREVER
+        if response.status_code == 200:
+            response.cache_control.max_age = FOREVER
+            response.expires = time.time() + FOREVER
         return response
