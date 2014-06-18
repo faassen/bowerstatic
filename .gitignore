@@ -1,6 +1,6 @@
 bin
 .installed.cfg
-bower_components
 parts
 develop-eggs
+.tern-port
 
