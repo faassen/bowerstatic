@@ -52,4 +52,5 @@ class Publisher(object):
         if response.status_code == 200:
             response.cache_control.max_age = FOREVER
             response.expires = time.time() + FOREVER
+        # XXX do we really want to rely on mimetype guessing?
         return response
