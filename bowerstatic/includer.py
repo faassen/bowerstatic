@@ -27,6 +27,10 @@ class Inclusions(object):
         return '\n'.join(snippets)
 
 
+class InclusionError(Exception):
+    pass
+
+
 class Inclusion(object):
     def __init__(self, bower, components_directory, package_name, path):
         self.bower = bower
@@ -57,6 +61,3 @@ class Inclusion(object):
         elif self.ext == '.css':
             return '<link rel="stylesheet" type="text/css" href="%s" />' % url
         assert False, "Unknown extension for url:" % url
-
-
-

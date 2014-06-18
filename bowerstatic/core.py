@@ -27,6 +27,9 @@ class Bower(object):
     def includer(self, name):
         return self._components_directories[name].includer(self)
 
+    def resources(self, name):
+        return self._components_directories[name].resources()
+
     def get_filename(self, bower_components_name,
                      package_name, package_version, file_path):
         components_directory = self._components_directories.get(
@@ -43,9 +46,13 @@ class ComponentsDirectory(object):
         self.name = name
         self.path = path
         self._packages = load_packages(path)
+        self._resources = Resources()
 
     def includer(self, bower):
         return Includer(bower, self)
+
+    def resources(self):
+        return self._resources
 
     def get_package(self, package_name):
         return self._packages.get(package_name)
@@ -95,3 +102,23 @@ class Package(object):
         return filename
 
 
+class Resources(object):
+    def __init__(self):
+        self._resources = {}
+
+    def get(self, package_name, file_path):
+        result = self._resources.get((package_name, file_path))
+        if result is None:
+            result = Resource(package_name, file_path)
+            self._resources[(package_name, file_path)] = result
+        return result
+
+
+class Resource(object):
+    def __init__(self, package_name, file_path):
+        self.package_name = package_name
+        self.file_path = file_path
+        self.dependencies = []
+
+    def depends_on(self, resource):
+        self._depends.append(resource)
