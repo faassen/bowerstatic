@@ -41,7 +41,7 @@ def test_wrap():
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = bower.includer(environ, 'components')
-        include('jquery', 'dist/jquery.js')
+        include('jquery/dist/jquery.js')
         return ['<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)

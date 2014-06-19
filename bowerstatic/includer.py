@@ -7,9 +7,8 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, package_name, path=None):
-        self.add(Inclusion(self.bower, self.components_directory,
-                           package_name, path))
+    def __call__(self, path=None):
+        self.add(Inclusion(self.bower, self.components_directory, path))
 
     def add(self, inclusion):
         inclusions = self.environ.setdefault(
@@ -34,17 +33,18 @@ class InclusionError(Exception):
 
 
 class Inclusion(object):
-    def __init__(self, bower, components_directory, package_name, path):
+    def __init__(self, bower, components_directory, path):
         self.bower = bower
         self.components_directory = components_directory
+        package_name, file_path = path.split('/', 1)
         self.package = self.components_directory.get_package(package_name)
         if self.package is None:
             raise InclusionError(
                 "Package %s not known in components directory %s (%s)" % (
                     package_name, components_directory.name,
                     components_directory.path))
-        self.path = path
-        dummy, self.ext = os.path.splitext(path)
+        self.file_path = file_path
+        dummy, self.ext = os.path.splitext(file_path)
 
     def url(self):
         parts = [
@@ -52,7 +52,7 @@ class Inclusion(object):
             self.components_directory.name,
             self.package.name,
             self.package.version,
-            self.path]
+            self.file_path]
         return '/' + '/'.join(parts)
 
     def html(self):

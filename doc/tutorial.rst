@@ -17,12 +17,13 @@ You create it like this::
 Declaring Bower Directories
 ---------------------------
 
-Bower manages a directory called ``bower_components`` by default. Bower
-installs packages into this directory as sub-directories.
+Bower manages a directory in which it installs packages. This
+directory is called ``bower_components`` by default. Bower installs
+packages into this directory as sub-directories.
 
 Packages in a Bower-managed directory can depend on each other, but
-not on packages installed in another directory -- each bower directory
-is an "isolated universe".
+not on packages installed in another directory -- each Bower directory
+is an "isolated universe" of packages.
 
 You need to let BowerStatic know where these directories are by adding
 them to the ``bower`` object::
@@ -60,8 +61,8 @@ You need to wrap the injector around your WSGI application as well::
 
   app = bower.injector(my_wsgi_app)
 
-Doing it all at once
---------------------
+Wrap: Doing it all at once
+--------------------------
 
 Typically you will need both the injector and the publisher to wrap
 your WSGI application. You can do this by hand::
@@ -90,7 +91,7 @@ object, as this is where the inclusions will be stored.
 
 Now you can tell it to include resources::
 
-  include('jquery', 'dist/jquery.js')
+  include('jquery/dist/jquery.js')
 
 This specifies you want to include the ``dist/jquery.js`` resource
 from within the installed ``jquery`` package. ``dist/jquery.js`` is a
