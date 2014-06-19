@@ -138,3 +138,29 @@ class Resource(object):
         self.path = path
         self.dependencies = [components_directory.get_resource(dependency) for
                              dependency in dependencies]
+
+        parts = path.split('/', 1)
+        if len(parts) == 2:
+            package_name, file_path = parts
+        else:
+            package_name = parts[0]
+            file_path = None
+        self.package = self.components_directory.get_package(package_name)
+        if self.package is None:
+            raise InclusionError(
+                "Package %s not known in components directory %s (%s)" % (
+                    package_name, components_directory.name,
+                    components_directory.path))
+        if file_path is None:
+            file_path = self.package.main
+        self.file_path = file_path
+        dummy, self.ext = os.path.splitext(file_path)
+
+    def url(self):
+        parts = [
+            self.bower.publisher_signature,
+            self.components_directory.name,
+            self.package.name,
+            self.package.version,
+            self.file_path]
+        return '/' + '/'.join(parts)

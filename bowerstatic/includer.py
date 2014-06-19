@@ -47,26 +47,6 @@ class Inclusion(object):
 class ResourceInclusion(Inclusion):
     def __init__(self, resource):
         self.resource = resource
-        self.bower = resource.bower
-        self.components_directory = resource.components_directory
-        # XXX move this into resource logic
-        path = resource.path
-        parts = path.split('/', 1)
-        if len(parts) == 2:
-            package_name, file_path = parts
-        else:
-            package_name = parts[0]
-            file_path = None
-        self.package = self.components_directory.get_package(package_name)
-        if self.package is None:
-            raise InclusionError(
-                "Package %s not known in components directory %s (%s)" % (
-                    package_name, self.components_directory.name,
-                    self.components_directory.path))
-        if file_path is None:
-            file_path = self.package.main
-        self.file_path = file_path
-        dummy, self.ext = os.path.splitext(file_path)
 
     def __repr__(self):
         return ('<bowerstatic.includer.ResourceInclusion for %s>' %
@@ -78,24 +58,16 @@ class ResourceInclusion(Inclusion):
     def __ne__(self, other):
         return self.resource is not other.resource
 
-    def url(self):
-        parts = [
-            self.bower.publisher_signature,
-            self.components_directory.name,
-            self.package.name,
-            self.package.version,
-            self.file_path]
-        return '/' + '/'.join(parts)
 
     def dependencies(self):
         return [ResourceInclusion(resource)
                 for resource in self.resource.dependencies]
 
     def html(self):
+        url = self.resource.url()
         # XXX should this be based on mimetype instead?
-        url = self.url()
-        if self.ext == '.js':
+        if self.resource.ext == '.js':
             return '<script type="text/javascript" src="%s"></script>' % url
-        elif self.ext == '.css':
+        elif self.resource.ext == '.css':
             return '<link rel="stylesheet" type="text/css" href="%s" />' % url
         assert False, "Unknown extension for url:" % url
