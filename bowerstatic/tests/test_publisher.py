@@ -33,7 +33,7 @@ def test_publisher_serve_files(c):
         '/bowerstatic/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
     assert response.cache_control.max_age == FOREVER
-    utc = response.expires.tzinfo  # get UTC has a hack
+    utc = response.expires.tzinfo  # get UTC as a hack
     # the test has just run and took less than a full day to run
     # we therefore expect expired to be greater than one_day_ago + FOREVER
     future = datetime.now(utc) - timedelta(days=1) + timedelta(seconds=FOREVER)
