@@ -15,7 +15,7 @@ class Bower(object):
     def add(self, name, path):
         self._components_directories[name] = ComponentsDirectory(name, path)
 
-    def middleware(self, wsgi):
+    def wrap(self, wsgi):
         return self.publisher(self.injector(wsgi))
 
     def publisher(self, wsgi):
@@ -24,8 +24,8 @@ class Bower(object):
     def injector(self, wsgi):
         return Injector(self, wsgi)
 
-    def includer(self, name):
-        return self._components_directories[name].includer(self)
+    def includer(self, environ, name):
+        return self._components_directories[name].includer(self, environ)
 
     def resources(self, name):
         return self._components_directories[name].resources()
@@ -48,8 +48,8 @@ class ComponentsDirectory(object):
         self._packages = load_packages(path)
         self._resources = Resources()
 
-    def includer(self, bower):
-        return Includer(bower, self)
+    def includer(self, bower, environ):
+        return Includer(bower, self, environ)
 
     def resources(self):
         return self._resources

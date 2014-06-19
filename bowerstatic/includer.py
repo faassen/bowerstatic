@@ -2,16 +2,18 @@ import os
 
 
 class Includer(object):
-    def __init__(self, bower, components_directory):
+    def __init__(self, bower, components_directory, environ):
         self.bower = bower
         self.components_directory = components_directory
+        self.environ = environ
 
-    def __call__(self, environ, package_name, path=None):
-        self.add(environ, Inclusion(self.bower, self.components_directory,
-                                    package_name, path))
+    def __call__(self, package_name, path=None):
+        self.add(Inclusion(self.bower, self.components_directory,
+                           package_name, path))
 
-    def add(self, environ, inclusion):
-        inclusions = environ.setdefault('bowerstatic.inclusions', Inclusions())
+    def add(self, inclusion):
+        inclusions = self.environ.setdefault(
+            'bowerstatic.inclusions', Inclusions())
         inclusions.add(inclusion)
 
 

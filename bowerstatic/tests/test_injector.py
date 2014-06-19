@@ -9,11 +9,10 @@ def test_injector():
     bower.add('bower_components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
-    includer = bower.includer('bower_components')
-
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
-        includer(environ, 'jquery', 'dist/jquery.js')
+        include = bower.includer(environ, 'bower_components')
+        include('jquery', 'dist/jquery.js')
         return ['<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
@@ -54,6 +53,8 @@ def test_injector_no_head_to_inject():
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = bower.includer(environ, 'bower_components')
+        include('jquery', 'dist/jquery.js')
         return ['<html><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
@@ -70,11 +71,10 @@ def test_injector_not_html_no_effect():
     bower.add('bower_components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
-    includer = bower.includer('bower_components')
-
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
-        includer(environ, 'jquery', 'dist/jquery.js')
+        include = bower.includer(environ, 'bower_components')
+        include('jquery', 'dist/jquery.js')
         return ['Hello!']
 
     injector = bower.injector(wsgi)
@@ -91,11 +91,10 @@ def test_injector_PUT_no_effect():
     bower.add('bower_components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
-    includer = bower.includer('bower_components')
-
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
-        includer(environ, 'jquery', 'dist/jquery.js')
+        include = bower.includer(environ, 'bower_components')
+        include('jquery', 'dist/jquery.js')
         return ['<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)

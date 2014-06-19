@@ -1,81 +1,235 @@
 Tutorial
 ========
 
-Declaring Bower Components
---------------------------
+The Bower object
+----------------
 
-You can declare directories as Bower components directories using
-the following API::
+To get started with BowerStatic you need a ``Bower``
+instance. Typically you only have one globally installed ``Bower``
+instance in your application, but you could have multiple ones.
+
+You create it like this::
 
   import bowerstatic
 
   bower = bowerstatic.Bower()
 
-  bower.add('static', 'path/to/bower_components')
+Declaring Bower Directories
+---------------------------
 
-Serving Static Resources
-------------------------
+Bower manages a directory called ``bower_components`` by default. Bower
+installs packages into this directory as sub-directories.
 
-Serving static resources using BowerStatic involves a special
-WSGI framework component, ``BowerPublisher``. If you want your
-WSGI application to serve Bower components, you can wrap it in a
-``BowerPublisher`` component::
+Packages in a Bower-managed directory can depend on each other, but
+not on packages installed in another directory -- each bower directory
+is an "isolated universe".
+
+You need to let BowerStatic know where these directories are by adding
+them to the ``bower`` object::
+
+  bower.add('components', '/path/to/bower_components')
+
+You need to give each Bower directory a unique name, in this case
+``components``. This name will be used in the URL used to serve
+packages in this directory to the web, later.
+
+Publisher: Serving Static Resources
+-----------------------------------
+
+Now that the ``bower`` object knows about which Bower directories to
+serve, you can let it serve its contents as static resources. You need
+to use a special WSGI framework component to do this, the
+publisher. You wrap your WSGI application with this framework
+component to give it the ability to serve these static resources to
+the web. Here's how you do this::
 
   app = bower.publisher(my_wsgi_app)
 
 ``app`` is now a WSGI application that does everything ``my_wsgi_app``
-does, as well as serve bower components under the special URL
+does, as well as serve Bower components under the special URL
 ``/bowerstatic``.
+
+Injector: Injecting Static Resources
+------------------------------------
+
+BowerStatic also automates the inclusion of static resources in your
+HTML page, by inserting the appropriate ``<script>`` and ``<link>``
+tags. This is done by another WSGI framework component, the injector.
+
+You need to wrap the injector around your WSGI application as well::
+
+  app = bower.injector(my_wsgi_app)
+
+Doing it all at once
+--------------------
+
+Typically you will need both the injector and the publisher to wrap
+your WSGI application. You can do this by hand::
+
+  app = bower.publisher(bower.injector(my_wsgi_app))
+
+but you can also do it in one easy step::
+
+  app = bower.wrap(my_wsgi_app)
 
 Including Static Resources in a HTML page
 -----------------------------------------
 
-Another WSGI framework component, ``BowerInjector``, can be used to
-automatically include those static resources you want into a web page
-using ``<script>`` and ``<link>`` tags and the like. First we wrap our
-WSGI application in the ``BowerInjector``::
+Now that you serve the static resources and have the injector
+installed, you need to be able to easily refer to resources from
+Python so they are included on the web pages you want.
 
-  app = bower.injector(my_wsgi_app)
+You create an ``include`` object::
 
-``app`` now is a WSGI application that does everything ``my_wsgi_app``
-does, as well as inject ``<script>`` and ``<link>`` tags when you
-requested a static resource to be served.
+  include = bower.includer(environ, 'bower_components')
 
-We can create an includer from ``bower_directories`` for the ``static``
-directory::
+You need to create the ``include`` object within your WSGI
+application, typically just before you specify what static resources
+you want it to include. You need to specify it the WSGI ``environ``
+object, as this is where the inclusions will be stored.
 
-  static = bower.includer('static')
+Now you can tell it to include resources::
 
-Here is how we refer to a static resource from Python (from somewhere
-in code that results in HTML to be rendered)::
+  include('jquery', 'dist/jquery.js')
 
-  static('jquery')
+This specifies you want to include the ``dist/jquery.js`` resource
+from within the installed ``jquery`` package. ``dist/jquery.js`` is a
+file within the package. It is an error to refer to a non-existent
+file.
 
-This includes the static resource indicated by ``main`` in the web
-page. In case of jQuery this is ``dist/jquery.js``. This results in
-the following ``<script>`` tag to be included in the HTML page::
-
-  <script
-    type="text/javascript"
-    src="/bowerstatic/static/jquery/2.1.1/dist/jquery.js">
-  </script>
-
-You can also refer to other files that you know are in the installed
-package::
-
-  static('jquery', 'dist/jquery.min.js')
-
-which results in this script tag::
+Doing this results in the injector adding the following ``<script>`` tag
+to the HTML page generated by your WSGI application::
 
   <script
     type="text/javascript"
-    src="/bowerstatic/static/jquery/2.1.1/dist/jquery.min.js">
+    src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">
   </script>
+
+URL structure
+-------------
+
+Let's look at the URLs used by BowerStatic for a moment::
+
+  /bowerstatic/components/jquery/2.1.1/dist/jquery.js
+
+``bowerstatic``
+  The BowerStatic signature. You can change the default signature used
+  by passing a ``signature`` argument to the ``Bower`` constructor.
+
+``components``
+  The unique name of the bower directory which you gave when you did an ``.add``.
+
+``jquery``
+  The name of the installed package as given by the ``name``
+  field in ``bower.json``.
+
+``2.1.1``
+  The version number of the installed package as given by the ``version``
+  field in ``bower.json``.
+
+``dist/jquery.js``
+  A relative path to a file within the package.
+
+Caching
+-------
+
+BowerStatic makes sure that resources are served with caching headers
+set to cache them forever [#forever]_. This means the browser does not
+request them from the server again after loading them once. If you
+install a caching proxy like Varnish or Squid in front of your web
+server, or use Apache ``mod_cache``, the WSGI server only has to serve
+the resource once, and then it served by cache forever.
+
+Caching forever would not normally be advisable as it would make it
+hard to upgrade to newer versions of packages. You would have to teach
+your users to issue a shift-reload to get the new version of
+JavaScript code. But with BowerStatic this is safe, as it includes the
+version number of the package in the URLs. When a new version of a
+package is installed, the version number is updated, and new URLs are
+generated by the include mechanism.
+
+.. [#forever] Well, for 10 years. But that's forever in web time.
+
+Main endpoint
+-------------
+
+Bower has a concept of a ``main`` end-point for a package in its
+``bower.json``. You can include the main endpoint by including the
+package without any specific file::
+
+  include('jquery')
+
+This includes the file listed in the ``main`` field in ``bower.json``.
+In the case of jQuery, this is the same file as we already included
+in the earlier examples: ``dist/jquery.js``.
+
+A package can also specify an array of files in ``main``, and
+BowerJson will in that case include all of them.
+
+XXX is that the correct behavior? maybe the first?
 
 Dependencies
 ------------
 
-BowerStatic knows about dependencies set up between Bower directories
+A Bower package may specify in its ``bower.json`` a dependency on
+other packages. Bower uses this to install the dependent packags
+automatically. The ``jquery-ui`` package for instance depends on the
+``jquery`` package, so when you install ``jquery-ui``, the ``jquery``
+package is automatically installed as well.
+
+This is different from dependencies between individual static
+resources. Bower has no information about these.
+
+JavaScript has no standard ``import`` statement like Python
+does. Instead, there are a many different ways to declare dependencies
+between JavaScript modules, each with their own advantages and
+drawbacks. One way to declare dependencies for client-side code is to
+use ``RequireJS``. NodeJS has its way to declare dependencies between
+modules on the server side, and tools like browserify can help to
+bring these to the client. EcmaScript 6 is introducing a module syntax
+of its own which will hopefully bring order to this chaos.
+
+The strategy used to deliver a set of modules with dependencies to the
+client is different than Python's: it's more like the way ``.so`` or
+``.dll`` library files are built. Instead of shipping a package with a
+lot of individual files, a single bundle is built from all the modules
+in a package. ``dist/jquery.js`` for instance is a bundled version of
+individual underlying jQuery modules that are developed in its ``src``
+directory. This is done not only because JavaScript does not have a
+native module system, but also because it's more efficient for a
+browser to load a single bundle than many individual files.
+
+A bundling module system like this has a drawback: you cannot declare
+a dependency between modules in different Bower packages.
+
+These module systems have a drawback: you cannot declare a dependency
+between a module in one package and a module in another.
+
+BowerStatic does not mandate a particular module system. Use whatever
+system you like. BowerStatic does let you define dependency
+relationships between JavaScript resources.
+
+You can optionally define dependency relationships
+between JavaScript resources however.
+
+It does offer
+a mechanism for specifying relationships between JavaScript files to help
+automate the
+
+ is to use a tool that bundles all the individual
+dependencies into a large file.
+
+There are a whole number of ways to declare dependencies between
+JavaScript modules. Some use client-side mechanisms
+
+ 
+There are a range of ways to do this using JavaScript either, either
+on the client-side (i.e. RequireJS) or on the server-side
+(i.e. Node-style and browserify).
+
+Bower can specify dependencies between packages
+
+BowerStatic knows about dependencies set up between Bower packages
 and can automate them. It will only do this when the ``main`` entry
 point is automatically requested, not when you include individual files.
 
