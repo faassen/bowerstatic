@@ -168,8 +168,8 @@ This includes the file listed in the ``main`` field in ``bower.json``.
 In the case of jQuery, this is the same file as we already included
 in the earlier examples: ``dist/jquery.js``.
 
-A package can also specify an array of files in ``main``, and
-BowerJson will in that case include all of them.
+A package can also specify an array of files in ``main``. In this case
+the only first endpoint listed in this array is included.
 
 XXX is that the correct behavior? maybe the first?
 

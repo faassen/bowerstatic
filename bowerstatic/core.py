@@ -85,16 +85,22 @@ def load_package(path):
         bower_json_filename = os.path.join(path, 'component.json')
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
-    return Package(data['name'],
+    if isinstance(data['main'], list):
+        main = data['main'][0]
+    else:
+        main = data['main']
+    return Package(path,
+                   data['name'],
                    data['version'],
-                   path)
+                   main)
 
 
 class Package(object):
-    def __init__(self, name, version, path):
+    def __init__(self, path, name, version, main):
+        self.path = path
         self.name = name
         self.version = version
-        self.path = path
+        self.main = main
 
     def get_filename(self, version, file_path):
         if version != self.version:

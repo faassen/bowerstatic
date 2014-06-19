@@ -36,13 +36,20 @@ class Inclusion(object):
     def __init__(self, bower, components_directory, path):
         self.bower = bower
         self.components_directory = components_directory
-        package_name, file_path = path.split('/', 1)
+        parts = path.split('/', 1)
+        if len(parts) == 2:
+            package_name, file_path = parts
+        else:
+            package_name = parts[0]
+            file_path = None
         self.package = self.components_directory.get_package(package_name)
         if self.package is None:
             raise InclusionError(
                 "Package %s not known in components directory %s (%s)" % (
                     package_name, components_directory.name,
                     components_directory.path))
+        if file_path is None:
+            file_path = self.package.main
         self.file_path = file_path
         dummy, self.ext = os.path.splitext(file_path)
 
