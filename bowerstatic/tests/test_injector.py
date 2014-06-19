@@ -133,7 +133,6 @@ def test_injector_endpoint_dependencies():
         '</head><body>Hello!</body></html>')
 
 
-@pytest.mark.xfail
 def test_injector_normal_dependencies():
     bower = bowerstatic.Bower()
 
@@ -159,14 +158,13 @@ def test_injector_normal_dependencies():
         b'<html><head>'
         '<script type="text/javascript" '
         'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
-        '</script>'
+        '</script>\n'
        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery-ui/1.4.5/ui/minified/jquery-ui.min.js">'
+        'src="/bowerstatic/components/jquery-ui/1.10.4/ui/minified/jquery-ui.min.js">'
         '</script>'
         '</head><body>Hello!</body></html>')
 
 
-@pytest.mark.xfail
 def test_injector_normal_dependencies_explicit_resource_objects():
     bower = bowerstatic.Bower()
 
@@ -195,9 +193,9 @@ def test_injector_normal_dependencies_explicit_resource_objects():
         b'<html><head>'
         '<script type="text/javascript" '
         'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
-        '</script>'
+        '</script>\n'
        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery-ui/1.4.5/ui/minified/jquery-ui.min.js">'
+        'src="/bowerstatic/components/jquery-ui/1.10.4/ui/minified/jquery-ui.min.js">'
         '</script>'
         '</head><body>Hello!</body></html>')
 

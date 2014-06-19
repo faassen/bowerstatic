@@ -60,8 +60,15 @@ class ComponentsDirectory(object):
         self._resources[path] = result
         return result
 
-    def get_resource(self, path):
-        return self._resources.get(path)
+    def get_resource(self, path_or_resource):
+        if isinstance(path_or_resource, basestring):
+            resource = self._resources.get(path_or_resource)
+            if resource is None:
+                resource = self.resource(path_or_resource)
+        else:
+            resource = path_or_resource
+            assert resource.components_directory is self
+        return resource
 
     def get_package(self, package_name):
         return self._packages.get(package_name)
@@ -127,4 +134,5 @@ class Resource(object):
         self.bower = bower
         self.components_directory = components_directory
         self.path = path
-        self.dependencies = dependencies
+        self.dependencies = [components_directory.get_resource(dependency) for
+                             dependency in dependencies]
