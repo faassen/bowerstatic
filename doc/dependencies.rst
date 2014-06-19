@@ -113,6 +113,6 @@ You can also refer to this resource in another resource definition::
      'jquery-ui/ui/minified/jquery-ui.min.js',
      dependencies=[jquery_min])
 
-Dealing with explicit resource objectscan be handy as it saves
+Dealing with explicit resource objects can be handy as it saves
 typing, and Python gives you an error if you refer to a resource
 object that does not exist, so you can catch typos early.
