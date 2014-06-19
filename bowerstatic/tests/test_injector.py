@@ -104,7 +104,6 @@ def test_injector_endpoint_resource():
         '</script></head><body>Hello!</body></html>')
 
 
-@pytest.mark.xfail
 def test_injector_endpoint_dependencies():
     bower = bowerstatic.Bower()
 
@@ -124,13 +123,45 @@ def test_injector_endpoint_dependencies():
     response = c.get('/')
     assert response.body == (
         b'<html><head>'
-        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
-        '</script>\n'
-        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery-ui/1.4.5/ui/jquery-ui.js">'
-        '</script>'
-        '</head><body>Hello!</body></html>')
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery-ui/'
+        b'1.10.4/ui/jquery-ui.js">'
+        b'</script>'
+        b'</head><body>Hello!</body></html>')
+
+
+def test_injector_endpoint_dependencies_with_explicit_resource_objects():
+    bower = bowerstatic.Bower()
+
+    components = bower.directory('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    jquery_ui = components.resource('jquery-ui')
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include(jquery_ui)
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery-ui/'
+        b'1.10.4/ui/jquery-ui.js">'
+        b'</script>'
+        b'</head><body>Hello!</body></html>')
 
 
 def test_injector_normal_dependencies():

@@ -13,7 +13,7 @@ class Includer(object):
         self.environ = environ
 
     def __call__(self, path_or_resource):
-        resource = self.components_directory.get_resource(path_or_resource)
+        resource = self.components_directory.path_to_resource(path_or_resource)
         self.add(ResourceInclusion(resource))
 
     def add(self, inclusion):

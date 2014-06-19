@@ -50,23 +50,27 @@ class ComponentsDirectory(object):
         self.path = path
         self._packages = load_packages(path)
         self._resources = {}
+        for package in self._packages.values():
+            package.create_main_resource(self)
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
     def resource(self, path, dependencies=None):
         dependencies = dependencies or []
-        if path in self._resources:
-            raise Error("Duplicate path for resource: %s" % path)
+        resource = self._resources.get(path)
+        if resource is not None:
+            return resource
         result = Resource(self.bower, self, path, dependencies)
         self._resources[path] = result
         return result
 
-    def get_resource(self, path_or_resource):
+    def get_resource(self, path):
+        return self._resources.get(path)
+
+    def path_to_resource(self, path_or_resource):
         if isinstance(path_or_resource, basestring):
-            resource = self._resources.get(path_or_resource)
-            if resource is None:
-                resource = self.resource(path_or_resource)
+            return self.resource(path_or_resource)
         else:
             resource = path_or_resource
             assert resource.components_directory is self
@@ -105,7 +109,7 @@ def load_package(path):
         main = data['main']
     dependencies = data.get('dependencies')
     if dependencies is None:
-        dependencies = []
+        dependencies = {}
     return Package(path,
                    data['name'],
                    data['version'],
@@ -120,6 +124,21 @@ class Package(object):
         self.version = version
         self.main = main
         self.dependencies = dependencies
+
+    def create_main_resource(self, components_directory):
+        # if the resource was already created, return it
+        resource = components_directory.get_resource(self.name)
+        if resource is not None:
+            return resource
+        # create a main resource for all dependencies
+        dependencies = []
+        for package_name in self.dependencies.keys():
+            package = components_directory.get_package(package_name)
+            dependencies.append(
+                package.create_main_resource(components_directory))
+        # depend on those main resources in this resource
+        return components_directory.resource(
+            self.name, dependencies=dependencies)
 
     def get_filename(self, version, file_path):
         if version != self.version:
@@ -136,8 +155,9 @@ class Resource(object):
         self.bower = bower
         self.components_directory = components_directory
         self.path = path
-        self.dependencies = [components_directory.get_resource(dependency) for
-                             dependency in dependencies]
+        self.dependencies = [
+            components_directory.path_to_resource(dependency) for
+            dependency in dependencies]
 
         parts = path.split('/', 1)
         if len(parts) == 2:
