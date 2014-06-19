@@ -7,9 +7,13 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, resource):
-        if isinstance(resource, basestring):
-            resource = self.components_directory.resource(resource)
+    def __call__(self, path_or_resource):
+        if isinstance(path_or_resource, basestring):
+            resource = self.components_directory.get_resource(path_or_resource)
+            if resource is None:
+                resource = self.components_directory.resource(path_or_resource)
+        else:
+            resource = path_or_resource
         self.add(Inclusion(resource))
 
     def add(self, inclusion):

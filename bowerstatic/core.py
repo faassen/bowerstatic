@@ -15,9 +15,9 @@ class Bower(object):
         self._components_directories = {}
 
     def directory(self, name, path):
-        result = ComponentsDirectory(self, name, path)
         if name in self._components_directories:
             raise Error("Duplicate name for components directory: %s" % name)
+        result = ComponentsDirectory(self, name, path)
         self._components_directories[name] = result
         return result
 
@@ -54,11 +54,14 @@ class ComponentsDirectory(object):
 
     def resource(self, path, dependencies=None):
         dependencies = dependencies or []
-        result = self._resources.get(path)
-        if result is None:
-            result = Resource(self.bower, self, path, dependencies)
-            self._resources[path] = result
+        if path in self._resources:
+            raise Error("Duplicate path for resource: %s" % path)
+        result = Resource(self.bower, self, path, dependencies)
+        self._resources[path] = result
         return result
+
+    def get_resource(self, path):
+        return self._resources.get(path)
 
     def get_package(self, package_name):
         return self._packages.get(package_name)
