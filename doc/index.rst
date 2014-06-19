@@ -12,27 +12,31 @@ Bower_ package manager.
 
 Features:
 
-* A WSGI-based server for static resources in Bower packages.
+* Integrates with any WSGI-based project.
 
-* Easily mark directories as being managed by Bower from Python, so that
-  static resources in them will be served.
+* Easily serve Bower-managed directories.
 
-* Automatically includes URLs to static resources in HTML pages when
-  you want it from Python, using ``<script>`` and ``<link>`` tags.
+* Easily say in Python code you want to include a static resource,
+  which are then automatically inserted in any HTML page you
+  generated. It uses the appropriate ``<script>`` and ``<link>`` tags.
 
-* Support for infinite caching of URLs by the browser and/or HTTP
-  caching servesr.
+* Support for Bower ``main`` end points. End points for dependencies
+  are automatically included too.
+
+* Declare additional dependencies from one resource to others, either
+  in the same package or in others.
+
+* Infinite caching of URLs by the browser and/or HTTP caching server for
+  increased performance.
 
 * Instantly bust the cache when a new version of Bower package is
-  installed.
+  installed, avoiding force reload.
 
-* Development mode for Bower packages, meaning it busts the cache as
-  soon as you make changes to code.
+* Local packages with automatic cache busting as soon as you edit
+  code.
 
-* Serves static resources on URLs that can be cached infinitely by the
-
-Table of Contents
------------------
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2

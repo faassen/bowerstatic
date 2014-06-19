@@ -169,9 +169,7 @@ In the case of jQuery, this is the same file as we already included
 in the earlier examples: ``dist/jquery.js``.
 
 A package can also specify an array of files in ``main``. In this case
-the only first endpoint listed in this array is included.
-
-XXX is that the correct behavior? maybe the first?
+the first endpoint listed in this array is included.
 
 The endpoint system is aware of Bower intra-package dependencies.
 Suppose you include 'jquery-ui'::
@@ -193,31 +191,45 @@ inclusions in your HTML::
     src="/bowerstatic/static/jquery-ui/1.10.4/ui/jquery-ui.js">
   </script>
 
-Thoughts
---------
+Local packages
+--------------
 
-* The 'bower' object may be a global, as in many setups you'd have
-  only one. I chose to make it explicit though.
+Consider a larger project where you are building a front-end web
+application that depends on several packages you install using Bower.
 
-* You can change which ``bower_components`` directory is used by using
-  a different includer, as bower components directories are mapped to
-  names (in this case 'static').
+BowerStatic can also be used to serve your own front-end code.
 
-* OO modeling. We could create a ``BowerComponents``, ``Package`` and
-  ``Resource`` abstraction along the lines of Fanstatic, meaning it
-  can be more than just a string or a tuple. This might make for a
-  nice API. But it also might create dependencies between packages
-  resources and the ``bower`` object, something Fanstatic has, but
-  perhaps it'd be simpler to avoid it. I'll explore this during coding
-  and writing tests.
+To do this, put your front-end code in a directory and register that
+directory like this::
 
-* There is no notion of a Python package that contains dependency
-  information, though those could be created; they could contain a
-  function that takes a 'bower' object and then calls ``depends`` on
-  it for whatever resource information they like.
+  components.package('mycode', '/path/to/directory', version='1.1.0')
 
-* The system to mark dependencies could be expanded to mark other
-  relationships between resources, including source versus minified
-  version, or bundle versus individual bit. It might also be possible
-  to export the dependency information to a client-side resource
-  inclusion system like RequireJS.
+You register this on the ``components`` object (created using
+``bower.directory``), because your code likely depends on resources
+within installed packages in that bower directory. This way you give
+your own code a consistent world of code it depends on.
+
+You give your package a name under which it is published to the
+web. It should not clash with a name of a package you install in
+components directory yourself.
+
+You specify a path to a directory that contains your package. This
+is published to the web as static resources.
+
+``version`` is the version number that the package should appear
+under. In a larger application you can pick this up from the server
+version, so that a new release of the server automatically updates
+the version number of all local packages (busting the cache).
+
+If your project has a ``setup.py``, you can do this like this::
+
+  import pkg_resources
+
+  version = pkg_resources.get_distribution('myproject').version
+
+You can also leave off ``version`` or set it to ``None``. This
+triggers "devmode". This causes the version to be automatically
+determined from the code in the package, and be different each time
+you edit the code. Since the version is included in the URL to the
+package, this allows you to get the latest version of the code as soon
+as you reload after editing a file.
