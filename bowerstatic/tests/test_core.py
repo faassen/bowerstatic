@@ -31,12 +31,12 @@ def test_dependencies():
     response = c.get('/')
     assert response.body == b''
 
+
 def test_wrap():
     bower = bowerstatic.Bower()
 
     components = bower.directory('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
-
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])

@@ -98,6 +98,7 @@ def test_different_publisher_signature():
         '/static/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
 
+
 def test_create_directory_with_name_twice():
     # XXX
     pass

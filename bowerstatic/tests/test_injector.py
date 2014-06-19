@@ -126,8 +126,8 @@ def test_injector_endpoint_dependencies():
         b'<html><head>'
         '<script type="text/javascript" '
         'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
-        '</script>'
-       '<script type="text/javascript" '
+        '</script>\n'
+        '<script type="text/javascript" '
         'src="/bowerstatic/components/jquery-ui/1.4.5/ui/jquery-ui.js">'
         '</script>'
         '</head><body>Hello!</body></html>')
@@ -156,13 +156,14 @@ def test_injector_normal_dependencies():
     response = c.get('/')
     assert response.body == (
         b'<html><head>'
-        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
-        '</script>\n'
-       '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery-ui/1.10.4/ui/minified/jquery-ui.min.js">'
-        '</script>'
-        '</head><body>Hello!</body></html>')
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery-ui/'
+        b'1.10.4/ui/minified/jquery-ui.min.js">'
+        b'</script>'
+        b'</head><body>Hello!</body></html>')
 
 
 def test_injector_normal_dependencies_explicit_resource_objects():
@@ -191,19 +192,20 @@ def test_injector_normal_dependencies_explicit_resource_objects():
     response = c.get('/')
     assert response.body == (
         b'<html><head>'
-        '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
-        '</script>\n'
-       '<script type="text/javascript" '
-        'src="/bowerstatic/components/jquery-ui/1.10.4/ui/minified/jquery-ui.min.js">'
-        '</script>'
-        '</head><body>Hello!</body></html>')
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.min.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery-ui/'
+        b'1.10.4/ui/minified/jquery-ui.min.js">'
+        b'</script>'
+        b'</head><body>Hello!</body></html>')
 
 
 def test_injector_no_inclusions():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    bower.directory('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):

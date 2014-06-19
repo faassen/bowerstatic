@@ -4,8 +4,10 @@ from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
 
+
 class Error(Exception):
     pass
+
 
 class Bower(object):
     """Contains a bunch of bower_components directories.

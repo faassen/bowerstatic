@@ -1,6 +1,7 @@
 import os
 from toposort import topological_sort
 
+
 class InclusionError(Exception):
     pass
 
@@ -60,8 +61,8 @@ class ResourceInclusion(Inclusion):
         if self.package is None:
             raise InclusionError(
                 "Package %s not known in components directory %s (%s)" % (
-                    package_name, components_directory.name,
-                    components_directory.path))
+                    package_name, self.components_directory.name,
+                    self.components_directory.path))
         if file_path is None:
             file_path = self.package.main
         self.file_path = file_path
