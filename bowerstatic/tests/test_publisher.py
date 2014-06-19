@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 def c():
     bower = bowerstatic.Bower()
 
-    bower.add('bower_components', os.path.join(
+    bower.directory('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -30,7 +30,7 @@ def test_publisher_passthrough(c):
 
 def test_publisher_serve_files(c):
     response = c.get(
-        '/bowerstatic/bower_components/jquery/2.1.1/dist/jquery.js')
+        '/bowerstatic/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
     assert response.cache_control.max_age == FOREVER
     utc = response.expires.tzinfo  # get UTC has a hack
@@ -40,7 +40,7 @@ def test_publisher_serve_files(c):
     assert response.expires >= future
 
     response = c.get(
-        '/bowerstatic/bower_components/jquery-ui/1.10.4/ui/jquery-ui.js')
+        '/bowerstatic/components/jquery-ui/1.10.4/ui/jquery-ui.js')
     assert response.body == b'/* jquery-ui.js 1.10.4 */\n'
 
 
@@ -50,7 +50,7 @@ def test_publisher_404_on_publisher_signature(c):
 
 
 def test_publisher_404_on_bower_components(c):
-    c.get('/bowerstatic/bower_components', status=404)
+    c.get('/bowerstatic/components', status=404)
 
 
 def test_publisher_404_on_nonexistent_bower_components(c):
@@ -58,31 +58,31 @@ def test_publisher_404_on_nonexistent_bower_components(c):
 
 
 def test_publisher_404_on_package(c):
-    c.get('/bowerstatic/bower_components/jquery', status=404)
+    c.get('/bowerstatic/components/jquery', status=404)
 
 
 def test_publisher_404_on_nonexistent_version(c):
-    c.get('/bowerstatic/bower_components/jquery/2.1.0', status=404)
+    c.get('/bowerstatic/components/jquery/2.1.0', status=404)
 
 
 def test_publisher_404_on_version(c):
-    c.get('/bowerstatic/bower_components/jquery/2.1.1', status=404)
+    c.get('/bowerstatic/components/jquery/2.1.1', status=404)
 
 
 def test_publisher_404_on_nonexistent_file(c):
-    c.get('/bowerstatic/bower_components/jquery/2.1.1/dist/nonexistent.js',
+    c.get('/bowerstatic/components/jquery/2.1.1/dist/nonexistent.js',
           status=404)
 
 
 def test_publisher_no_sneaky_escape(c):
-    c.get('/bowerstatic/bower_components/jquery/2.1.1/../../../publisher.py',
+    c.get('/bowerstatic/components/jquery/2.1.1/../../../publisher.py',
           status=404)
 
 
 def test_different_publisher_signature():
     bower = bowerstatic.Bower(publisher_signature='static')
 
-    bower.add('bower_components', os.path.join(
+    bower.directory('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -95,5 +95,9 @@ def test_different_publisher_signature():
     response = c.get('/')
     assert response.body == b'Hello!'
     response = c.get(
-        '/static/bower_components/jquery/2.1.1/dist/jquery.js')
+        '/static/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
+
+def test_create_directory_with_name_twice():
+    # XXX
+    pass

@@ -4,6 +4,8 @@ from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
 
+class Error(Exception):
+    pass
 
 class Bower(object):
     """Contains a bunch of bower_components directories.
@@ -12,8 +14,12 @@ class Bower(object):
         self.publisher_signature = publisher_signature
         self._components_directories = {}
 
-    def add(self, name, path):
-        self._components_directories[name] = ComponentsDirectory(name, path)
+    def directory(self, name, path):
+        result = ComponentsDirectory(self, name, path)
+        if name in self._components_directories:
+            raise Error("Duplicate name for components directory: %s" % name)
+        self._components_directories[name] = result
+        return result
 
     def wrap(self, wsgi):
         return self.publisher(self.injector(wsgi))
@@ -23,9 +29,6 @@ class Bower(object):
 
     def injector(self, wsgi):
         return Injector(self, wsgi)
-
-    def includer(self, environ, name):
-        return self._components_directories[name].includer(self, environ)
 
     def resources(self, name):
         return self._components_directories[name].resources()
@@ -42,14 +45,15 @@ class Bower(object):
 
 
 class ComponentsDirectory(object):
-    def __init__(self, name, path):
+    def __init__(self, bower, name, path):
+        self.bower = bower
         self.name = name
         self.path = path
         self._packages = load_packages(path)
         self._resources = Resources()
 
-    def includer(self, bower, environ):
-        return Includer(bower, self, environ)
+    def includer(self, environ):
+        return Includer(self.bower, self, environ)
 
     def resources(self):
         return self._resources

@@ -34,13 +34,13 @@ def test_dependencies():
 def test_wrap():
     bower = bowerstatic.Bower()
 
-    bower.add('components', os.path.join(
+    components = bower.directory('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
-        include = bower.includer(environ, 'components')
+        include = components.includer(environ)
         include('jquery/dist/jquery.js')
         return ['<html><head></head><body>Hello!</body></html>']
 

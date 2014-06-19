@@ -28,11 +28,12 @@ is an "isolated universe" of packages.
 You need to let BowerStatic know where these directories are by adding
 them to the ``bower`` object::
 
-  bower.add('components', '/path/to/bower_components')
+  components = bower.directory('components', '/path/to/bower_components')
 
 You need to give each Bower directory a unique name, in this case
 ``components``. This name will be used in the URL used to serve
-packages in this directory to the web, later.
+packages in this directory to the web, later. We assign the created
+directory object to a global variable ``components`` we use later.
 
 Publisher: Serving Static Resources
 -----------------------------------
@@ -80,16 +81,19 @@ Now that you serve the static resources and have the injector
 installed, you need to be able to easily refer to resources from
 Python so they are included on the web pages you want.
 
-You create an ``include`` object::
+Using the ``components`` object we created earlier for a bower
+directory, you create a ``include`` function::
 
-  include = bower.includer(environ, 'bower_components')
+  include = components.includer(environ)
 
-You need to create the ``include`` object within your WSGI
-application, typically just before you specify what static resources
-you want it to include. You need to specify it the WSGI ``environ``
-object, as this is where the inclusions will be stored.
+You need to create the ``include`` function within your WSGI
+application, typically just before you use it specify what static
+resources you want to include. You need to pass in the WSGI
+``environ`` object, as this is where the inclusions will be
+stored. You can create the ``include`` function as many times as you
+like for a WSGI environ; the inclusions are shared.
 
-Now you can tell it to include resources::
+Now you can use the ``include`` function to include resources::
 
   include('jquery/dist/jquery.js')
 
@@ -169,78 +173,16 @@ BowerJson will in that case include all of them.
 
 XXX is that the correct behavior? maybe the first?
 
-Dependencies
-------------
+The endpoint system is aware of Bower intra-package dependencies.
+Suppose you include 'jquery-ui'::
 
-A Bower package may specify in its ``bower.json`` a dependency on
-other packages. Bower uses this to install the dependent packags
-automatically. The ``jquery-ui`` package for instance depends on the
-``jquery`` package, so when you install ``jquery-ui``, the ``jquery``
-package is automatically installed as well.
+  include('jquery-ui')
 
-This is different from dependencies between individual static
-resources. Bower has no information about these.
-
-JavaScript has no standard ``import`` statement like Python
-does. Instead, there are a many different ways to declare dependencies
-between JavaScript modules, each with their own advantages and
-drawbacks. One way to declare dependencies for client-side code is to
-use ``RequireJS``. NodeJS has its way to declare dependencies between
-modules on the server side, and tools like browserify can help to
-bring these to the client. EcmaScript 6 is introducing a module syntax
-of its own which will hopefully bring order to this chaos.
-
-The strategy used to deliver a set of modules with dependencies to the
-client is different than Python's: it's more like the way ``.so`` or
-``.dll`` library files are built. Instead of shipping a package with a
-lot of individual files, a single bundle is built from all the modules
-in a package. ``dist/jquery.js`` for instance is a bundled version of
-individual underlying jQuery modules that are developed in its ``src``
-directory. This is done not only because JavaScript does not have a
-native module system, but also because it's more efficient for a
-browser to load a single bundle than many individual files.
-
-A bundling module system like this has a drawback: you cannot declare
-a dependency between modules in different Bower packages.
-
-These module systems have a drawback: you cannot declare a dependency
-between a module in one package and a module in another.
-
-BowerStatic does not mandate a particular module system. Use whatever
-system you like. BowerStatic does let you define dependency
-relationships between JavaScript resources.
-
-You can optionally define dependency relationships
-between JavaScript resources however.
-
-It does offer
-a mechanism for specifying relationships between JavaScript files to help
-automate the
-
- is to use a tool that bundles all the individual
-dependencies into a large file.
-
-There are a whole number of ways to declare dependencies between
-JavaScript modules. Some use client-side mechanisms
-
- 
-There are a range of ways to do this using JavaScript either, either
-on the client-side (i.e. RequireJS) or on the server-side
-(i.e. Node-style and browserify).
-
-Bower can specify dependencies between packages
-
-BowerStatic knows about dependencies set up between Bower packages
-and can automate them. It will only do this when the ``main`` entry
-point is automatically requested, not when you include individual files.
-
-jQuery UI for instance depends on jQuery. So if you have ``jquery-ui``
-installed, you can pull in its main file like this::
-
-  static('jquery-ui')
-
-Since its ``bower.json`` lists jquery as a dependency, it will also
-include jQuery, resulting in two script tags::
+The ``jquery-ui`` package specifies in the ``dependencies`` field in
+its ``bower.json`` that it depends on the ``jquery`` package. When you
+include the ``jquery-ui`` endpoint, BowerStatic automatically also
+include the ``jquery`` endpoint for you. You therefore get two
+inclusions in your HTML::
 
   <script
     type="text/javascript"
@@ -249,43 +191,6 @@ include jQuery, resulting in two script tags::
   <script
     type="text/javascript"
     src="/bowerstatic/static/jquery-ui/1.10.4/ui/jquery-ui.js">
-  </script>
-
-More dependencies
------------------
-
-It can be useful to establish other dependencies between static
-resources that you know about but that Bower doesn't list. There are a
-range of ways to do this using JavaScript either, either on the
-client-side (i.e. RequireJS) or on the server-side (i.e. Node-style
-and browserify).
-
-You can also supply additional dependency information
-to ``BowerStatic`` if you so wish. We know for instance that a
-minified version of jQuery UI is shipped in jquery-ui under the path
-``ui/minified/jquery-ui.min.js``, and that a minified version of
-jQuery is available under the path ``dist/jquery.min.js``. We
-can establish this dependency as follows::
-
-  bower.depends('static',
-                resource=('jquery-ui', 'ui/minified/jquery-ui.min.js'),
-                depends=[('jquery', 'dist/jquery.min.js')])
-
-A resource is a tuple given the package name and a path within that
-package to the resource. Here we specify that the ``jquery-ui.min.js``
-resource depends on the ``jquery.min.js`` resource. Depends is a list,
-as a resource may depend on multiple resources.
-
-Now when you depend on ``jquery-ui.min.js`` you will also automatically
-get the ``jquery.min.js`` resource::
-
-  <script
-    type="text/javascript"
-    src="/bowerstatic/static/jquery/2.1.1/dist/jquery.min.js">
-  </script>
-  <script
-    type="text/javascript"
-    src="/bowerstatic/static/jquery-ui/1.10.4/ui/minified/jquery-ui.min.js">
   </script>
 
 Thoughts
