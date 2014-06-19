@@ -30,9 +30,6 @@ class Bower(object):
     def injector(self, wsgi):
         return Injector(self, wsgi)
 
-    def resources(self, name):
-        return self._components_directories[name].resources()
-
     def get_filename(self, bower_components_name,
                      package_name, package_version, file_path):
         components_directory = self._components_directories.get(
@@ -50,13 +47,18 @@ class ComponentsDirectory(object):
         self.name = name
         self.path = path
         self._packages = load_packages(path)
-        self._resources = Resources()
+        self._resources = {}
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
-    def resources(self):
-        return self._resources
+    def resource(self, path, dependencies=None):
+        dependencies = dependencies or []
+        result = self._resources.get(path)
+        if result is None:
+            result = Resource(self.bower, self, path, dependencies)
+            self._resources[path] = result
+        return result
 
     def get_package(self, package_name):
         return self._packages.get(package_name)
@@ -89,18 +91,23 @@ def load_package(path):
         main = data['main'][0]
     else:
         main = data['main']
+    dependencies = data.get('dependencies')
+    if dependencies is None:
+        dependencies = []
     return Package(path,
                    data['name'],
                    data['version'],
-                   main)
+                   main,
+                   dependencies)
 
 
 class Package(object):
-    def __init__(self, path, name, version, main):
+    def __init__(self, path, name, version, main, dependencies):
         self.path = path
         self.name = name
         self.version = version
         self.main = main
+        self.dependencies = dependencies
 
     def get_filename(self, version, file_path):
         if version != self.version:
@@ -112,23 +119,9 @@ class Package(object):
         return filename
 
 
-class Resources(object):
-    def __init__(self):
-        self._resources = {}
-
-    def get(self, package_name, file_path):
-        result = self._resources.get((package_name, file_path))
-        if result is None:
-            result = Resource(package_name, file_path)
-            self._resources[(package_name, file_path)] = result
-        return result
-
-
 class Resource(object):
-    def __init__(self, package_name, file_path):
-        self.package_name = package_name
-        self.file_path = file_path
-        self.dependencies = []
-
-    def depends_on(self, resource):
-        self._depends.append(resource)
+    def __init__(self, bower, components_directory, path, dependencies):
+        self.bower = bower
+        self.components_directory = components_directory
+        self.path = path
+        self.dependencies = dependencies

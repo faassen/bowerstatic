@@ -38,6 +38,7 @@ Table of Contents
    :maxdepth: 2
 
    tutorial
+   dependencies
 
 Indices and tables
 ------------------

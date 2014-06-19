@@ -7,8 +7,10 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, path=None):
-        self.add(Inclusion(self.bower, self.components_directory, path))
+    def __call__(self, resource):
+        if isinstance(resource, basestring):
+            resource = self.components_directory.resource(resource)
+        self.add(Inclusion(resource))
 
     def add(self, inclusion):
         inclusions = self.environ.setdefault(
@@ -33,9 +35,10 @@ class InclusionError(Exception):
 
 
 class Inclusion(object):
-    def __init__(self, bower, components_directory, path):
-        self.bower = bower
-        self.components_directory = components_directory
+    def __init__(self, resource):
+        self.bower = resource.bower
+        self.components_directory = resource.components_directory
+        path = resource.path
         parts = path.split('/', 1)
         if len(parts) == 2:
             package_name, file_path = parts
