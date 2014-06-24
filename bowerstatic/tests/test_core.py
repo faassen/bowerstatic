@@ -7,7 +7,7 @@ import pytest
 def test_wrap():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):

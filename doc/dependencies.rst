@@ -65,7 +65,7 @@ In order to use dependencies you need to specify extra information for
 resources. This is done using the resource method on the directory
 object::
 
-  components = bower.directory('components', '/path/to/bower_components')
+  components = bower.components('components', '/path/to/bower_components')
 
   components.resource(
      'jquery-ui/ui/minified/jquery-ui.min.js',

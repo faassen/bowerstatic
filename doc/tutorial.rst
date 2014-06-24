@@ -28,7 +28,7 @@ is an "isolated universe" of packages.
 You need to let BowerStatic know where these directories are by adding
 them to the ``bower`` object::
 
-  components = bower.directory('components', '/path/to/bower_components')
+  components = bower.components('components', '/path/to/bower_components')
 
 You need to give each Bower directory a unique name, in this case
 ``components``. This name will be used in the URL used to serve
@@ -205,7 +205,7 @@ directory like this::
   components.package('mycode', '/path/to/directory', version='1.1.0')
 
 You register this on the ``components`` object (created using
-``bower.directory``), because your code likely depends on resources
+``bower.components``), because your code likely depends on resources
 within installed packages in that bower directory. This way you give
 your own code a consistent world of code it depends on.
 

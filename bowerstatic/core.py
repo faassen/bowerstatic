@@ -16,7 +16,7 @@ class Bower(object):
         self.publisher_signature = publisher_signature
         self._components_directories = {}
 
-    def directory(self, name, path):
+    def components(self, name, path):
         if name in self._components_directories:
             raise Error("Duplicate name for components directory: %s" % name)
         result = ComponentsDirectory(self, name, path)

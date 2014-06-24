@@ -7,7 +7,7 @@ import pytest
 def test_injector_specific_path():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -31,7 +31,7 @@ def test_injector_specific_path():
 def test_injector_specific_resource():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     jquery = components.resource('jquery/dist/jquery.js')
@@ -57,7 +57,7 @@ def test_injector_specific_resource():
 def test_injector_endpoint_path():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -81,7 +81,7 @@ def test_injector_endpoint_path():
 def test_injector_endpoint_resource():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     jquery = components.resource('jquery')
@@ -107,7 +107,7 @@ def test_injector_endpoint_resource():
 def test_injector_endpoint_dependencies():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -136,7 +136,7 @@ def test_injector_endpoint_dependencies():
 def test_injector_endpoint_dependencies_with_explicit_resource_objects():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     jquery_ui = components.resource('jquery-ui')
@@ -167,7 +167,7 @@ def test_injector_endpoint_dependencies_with_explicit_resource_objects():
 def test_injector_normal_dependencies():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     components.resource(
@@ -200,7 +200,7 @@ def test_injector_normal_dependencies():
 def test_injector_normal_dependencies_explicit_resource_objects():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     jquery_min = components.resource(
@@ -236,7 +236,7 @@ def test_injector_normal_dependencies_explicit_resource_objects():
 def test_injector_no_inclusions():
     bower = bowerstatic.Bower()
 
-    bower.directory('components', os.path.join(
+    bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -254,7 +254,7 @@ def test_injector_no_inclusions():
 def test_injector_no_head_to_inject():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -274,7 +274,7 @@ def test_injector_no_head_to_inject():
 def test_injector_not_html_no_effect():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -294,7 +294,7 @@ def test_injector_not_html_no_effect():
 def test_injector_PUT_no_effect():
     bower = bowerstatic.Bower()
 
-    components = bower.directory('components', os.path.join(
+    components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):

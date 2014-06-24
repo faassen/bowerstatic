@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 def c():
     bower = bowerstatic.Bower()
 
-    bower.directory('components', os.path.join(
+    bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
@@ -82,7 +82,7 @@ def test_publisher_no_sneaky_escape(c):
 def test_different_publisher_signature():
     bower = bowerstatic.Bower(publisher_signature='static')
 
-    bower.directory('components', os.path.join(
+    bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
     def wsgi(environ, start_response):
