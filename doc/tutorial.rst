@@ -233,6 +233,9 @@ Here's how we would add a local component called ``mycode``::
 
   local.component('mycode', '/path/to/directory/mycode', version='1.1.0')
 
+XXX since 'main' is also useful, we *should* use bower.json for the name
+  and version. Though version rules are special.
+
 A component is defined by a unique name (which is used in its URL),
 a path to a directory with client-side code in it that you want
 to publish under that name, and a version.
