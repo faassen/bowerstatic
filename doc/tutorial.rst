@@ -191,45 +191,114 @@ inclusions in your HTML::
     src="/bowerstatic/static/jquery-ui/1.10.4/ui/jquery-ui.js">
   </script>
 
-Local packages
---------------
+Local components
+----------------
 
-Consider a larger project where you are building a front-end web
-application that depends on several packages you install using Bower.
+Now we have a way to publish and use Bower packages. But you also
+develop your own front-end code: so-called "local
+components". BowerStatic also helps with that. For this it is
+important to understand that locally developed code has special
+caching requirements:
 
-BowerStatic can also be used to serve your own front-end code.
+* When you release a local component, you want it to be cached
+  infinitely just like for Bower components.
 
-To do this, put your front-end code in a directory and register that
-directory like this::
+  But when later a new release is made, you want that cache to be
+  invalidated, and not force end-users to do a shift-reload to get
+  their browser to load the new version of the code. We can accomplish
+  this by using a version number in the URL, just like for Bower
+  components.
 
-  components.package('mycode', '/path/to/directory', version='1.1.0')
+  XXX one way to release a local component would be to release it
+  as a bower component at this point. But this may be cumbersome
+  for code maintained as part of Python package.
 
-You register this on the ``components`` object (created using
-``bower.components``), because your code likely depends on resources
-within installed packages in that bower directory. This way you give
-your own code a consistent world of code it depends on.
+* When you *develop* a local component, you want the cache to be
+  invalidated as soon as you make any changes to the code, so you
+  aren't forced to do shift-reload either. A way to look at this is
+  that you want the system to make a new version number for each and
+  every edit to the local component.
 
-You give your package a name under which it is published to the
-web. It should not clash with a name of a package you install in
-components directory yourself.
+To have local components, you first need a special local components
+registry::
 
-You specify a path to a directory that contains your package. This
-is published to the web as static resources.
+  local = bower.local_components('local')
+
+You can have more than one local components registry, but typically
+you only need one per project. It does not point to a
+``bower_components`` directory to find its components. Instead, multiple
+directories can be registered into it manually.
+
+Here's how we would add a local component called ``mycode``::
+
+  local.component('mycode', '/path/to/directory/mycode', version='1.1.0')
+
+A component is defined by a unique name (which is used in its URL),
+a path to a directory with client-side code in it that you want
+to publish under that name, and a version.
+
+The directory with client-side code in it can have any structure. It
+could have a ``bower.json`` in it, but this is not inspected by the
+local components registry. You could organize it so that the local
+component is within a Python package.
+
+If you have a file ``app.js`` in the local component directory, it
+is published under this URL::
+
+  /bowerstatic/local/mycode/1.1.0/app.js
+
+To be able to include it, we need to construct an includer that also
+looks at the local components if it cannot find it in the
+bower components::
+
+  include = components.includer(environ, local=local)
+
+You can now include ``app.js`` in ``mycode`` like this::
+
+  include('mycode/app.js')
+
+Versioning
+~~~~~~~~~~
+
+Let's consider versioning in more detail.
 
 ``version`` is the version number that the package should appear
-under. In a larger application you can pick this up from the server
-version, so that a new release of the server automatically updates
-the version number of all local packages (busting the cache).
+under. You can pick this up from the application version, so that a
+new release of the application automatically updates the version
+number of all local packages (busting the cache).
 
-If your project has a ``setup.py``, you can do this like this::
+You could for instance pick it up from the Python project's
+``setup.py`` like this::
 
   import pkg_resources
 
   version = pkg_resources.get_distribution('myproject').version
 
 You can also leave off ``version`` or set it to ``None``. This
-triggers "devmode". This causes the version to be automatically
-determined from the code in the package, and be different each time
-you edit the code. Since the version is included in the URL to the
-package, this allows you to get the latest version of the code as soon
-as you reload after editing a file.
+triggers ``devmode`` for that local component. It causes the version
+to be automatically determined from the code in the package, and be
+different each time you edit the code. Since the version is included
+in the URL to the package, this allows you to get the latest version
+of the code as soon as you reload after editing a file. No
+shift-reloads needed to reload the code!
+
+Devmode is relatively expensive, as BowerStatic has to monitor the
+local directory for any changes to update the version number. You
+should make sure you don't able it during a release, but pass the real
+version number itself.
+
+If your application has a notion of a development mode that you can
+somehow inspect during run-time, you can write a version function that
+automatically returns ``None`` in development mode and otherwise returns
+the application's version number. This ensures optimal caching behavior
+during development and deployment both. Here's what this function could
+look like::
+
+  def get_version():
+      if is_devmode_enabled():
+          return None
+      return pkg_resources.get_distribution('myproject').version
+
+You can then use this function when you register a local component::
+
+  local.component('mycode', '/path/to/directory/mycode', version=get_version())
