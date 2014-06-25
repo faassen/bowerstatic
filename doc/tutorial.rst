@@ -5,8 +5,8 @@ The Bower object
 ----------------
 
 To get started with BowerStatic you need a ``Bower``
-instance. Typically you only have one globally installed ``Bower``
-instance in your application, but you could have multiple ones.
+instance. Typically you only have one global ``Bower`` instance in
+your application.
 
 You create it like this::
 
@@ -17,93 +17,84 @@ You create it like this::
 Declaring Bower Directories
 ---------------------------
 
-Bower manages a directory in which it installs packages. This
-directory is called ``bower_components`` by default. Bower installs
-packages into this directory as sub-directories.
+Bower manages a directory in which it installs components (jQuery,
+React, Ember, etc). This directory is called ``bower_components`` by
+default. Bower installs components into this directory as
+sub-directories. Bower makes sure that the components fit together
+according to their dependency requirements.
 
-Packages in a Bower-managed directory can depend on each other, but
-not on packages installed in another directory -- each Bower directory
-is an "isolated universe" of packages.
+Each ``bower_components`` directory is an "isolated universe" of
+components. Components in a ``bower_components`` directory can depend
+on each other only -- they cannot depend on components in another
+``bower_components`` directory.
 
-You need to let BowerStatic know where these directories are by adding
-them to the ``bower`` object::
+You need to let BowerStatic know where a ``bower_components``
+directory is by registering it with the ``bower`` object::
 
   components = bower.components('components', '/path/to/bower_components')
 
-You need to give each Bower directory a unique name, in this case
-``components``. This name will be used in the URL used to serve
-packages in this directory to the web, later. We assign the created
-directory object to a global variable ``components`` we use later.
+You can register multiple ``bower_components`` directories with the
+``bower`` object. You need to give each a unique name; in the example
+it is ``components``. This name is used in the URL used to serve
+components in this directory to the web.
 
-Publisher: Serving Static Resources
------------------------------------
-
-Now that the ``bower`` object knows about which Bower directories to
-serve, you can let it serve its contents as static resources. You need
-to use a special WSGI framework component to do this, the
-publisher. You wrap your WSGI application with this framework
-component to give it the ability to serve these static resources to
-the web. Here's how you do this::
-
-  app = bower.publisher(my_wsgi_app)
-
-``app`` is now a WSGI application that does everything ``my_wsgi_app``
-does, as well as serve Bower components under the special URL
-``/bowerstatic``.
-
-Injector: Injecting Static Resources
-------------------------------------
-
-BowerStatic also automates the inclusion of static resources in your
-HTML page, by inserting the appropriate ``<script>`` and ``<link>``
-tags. This is done by another WSGI framework component, the injector.
-
-You need to wrap the injector around your WSGI application as well::
-
-  app = bower.injector(my_wsgi_app)
-
-Wrap: Doing it all at once
---------------------------
-
-Typically you will need both the injector and the publisher to wrap
-your WSGI application. You can do this by hand::
-
-  app = bower.publisher(bower.injector(my_wsgi_app))
-
-but you can also do it in one easy step::
-
-  app = bower.wrap(my_wsgi_app)
+The object returned we assign to a variable ``components`` that we use
+later.
 
 Including Static Resources in a HTML page
 -----------------------------------------
 
-Now that you serve the static resources and have the injector
-installed, you need to be able to easily refer to resources from
-Python so they are included on the web pages you want.
+Now that we have a ``components`` object we can start including static
+resources from these components in a HTML page. BowerStatic provides
+an easy, automatic way for you to do this from Python.
 
-Using the ``components`` object we created earlier for a bower
-directory, you create a ``include`` function::
+Using the ``components`` object we created earlier for a
+``bower_components`q directory, you create a ``include`` function::
 
   include = components.includer(environ)
 
-You need to create the ``include`` function within your WSGI
-application, typically just before you use it specify what static
-resources you want to include. You need to pass in the WSGI
-``environ`` object, as this is where the inclusions will be
-stored. You can create the ``include`` function as many times as you
-like for a WSGI environ; the inclusions are shared.
+.. sidebar:: WSGI?
 
-Now you can use the ``include`` function to include resources::
+  WSGI_ is a Python standard for interoperability between web
+  applications and web servers. It also allows you to plug in
+  "middleware" that sit between web server and web application that
+  adds extra functionality. BowerStatic provides such middleware,
+  which we will see later.
+
+  Most Python web frameworks are WSGI based. This means that if you
+  use such a web framework for your application, your application is a
+  WSGI application. Where this documentation says "WSGI application"
+  you can read "your application".
+
+  BowerStatic's includer system needs to interact with the WSGI
+  ``environ`` object. To get to ``environ`` in your framework a good bet
+  is to try ``request.environ``; this should work in most frameworks.
+
+  Your web framework may also have special integration with
+  BowerStatic; in that case the integration takes care of getting the
+  ``environ`` for you.
+
+  .. _WSGI: http://wsgi.readthedocs.org/en/latest/
+
+You need to create the ``include`` function within your WSGI
+application, typically just before you want to use it. You need to
+pass in the WSGI ``environ`` object, as this is where the inclusions
+are stored. You can create the ``include`` function as many times as
+you like for a WSGI environ; the inclusions are shared.
+
+Now that we have ``include``, we can use it to include resources::
 
   include('jquery/dist/jquery.js')
 
 This specifies you want to include the ``dist/jquery.js`` resource
-from within the installed ``jquery`` package. ``dist/jquery.js`` is a
-file within the package. It is an error to refer to a non-existent
-file.
+from within the installed ``jquery`` package. This refers to an actual
+file in the jQuery component; in ``bower_components`` there is a
+directory ``jquery`` with the sub-path ``dist/jquery.js`` inside. It
+is an error to refer to a non-existent file.
 
-Doing this results in the injector adding the following ``<script>`` tag
-to the HTML page generated by your WSGI application::
+If you call ``include`` somewhere in code where also a HTML page is
+generated, BowerStatic adds the following ``<script>`` tag to that
+HTML page automatically::
 
   <script
     type="text/javascript"
@@ -191,11 +182,52 @@ inclusions in your HTML::
     src="/bowerstatic/static/jquery-ui/1.10.4/ui/jquery-ui.js">
   </script>
 
+
+Publisher: Serving Static Resources
+-----------------------------------
+
+Now that the ``bower`` object knows about which Bower directories to
+serve, you can let it serve its contents as static resources. You need
+to use a special WSGI framework component to do this, the
+publisher. You wrap your WSGI application with this framework
+component to give it the ability to serve these static resources to
+the web. Here's how you do this::
+
+  app = bower.publisher(my_wsgi_app)
+
+``app`` is now a WSGI application that does everything ``my_wsgi_app``
+does, as well as serve Bower components under the special URL
+``/bowerstatic``.
+
+Injector: Injecting Static Resources
+------------------------------------
+
+BowerStatic also automates the inclusion of static resources in your
+HTML page, by inserting the appropriate ``<script>`` and ``<link>``
+tags. This is done by another WSGI framework component, the injector.
+
+You need to wrap the injector around your WSGI application as well::
+
+  app = bower.injector(my_wsgi_app)
+
+Wrap: Doing it all at once
+--------------------------
+
+Typically you will need both the injector and the publisher to wrap
+your WSGI application. You can do this by hand::
+
+  app = bower.publisher(bower.injector(my_wsgi_app))
+
+but you can also do it in one easy step::
+
+  app = bower.wrap(my_wsgi_app)
+
+
 Local components
 ----------------
 
 Now we have a way to publish and use Bower packages. But you also
-develop your own front-end code: so-called "local
+develop your own front-end code: we call these "local
 components". BowerStatic also helps with that. For this it is
 important to understand that locally developed code has special
 caching requirements:
@@ -203,11 +235,12 @@ caching requirements:
 * When you release a local component, you want it to be cached
   infinitely just like for Bower components.
 
-  But when later a new release is made, you want that cache to be
+  When later a new release is made, you want that cache to be
   invalidated, and not force end-users to do a shift-reload to get
-  their browser to load the new version of the code. We can accomplish
-  this by using a version number in the URL, just like for Bower
-  components.
+  their browser to load the new version of the code.
+
+  We can accomplish this behavior by using a version number in the
+  URL, just like for Bower components.
 
   XXX one way to release a local component would be to release it
   as a bower component at this point. But this may be cumbersome
@@ -215,30 +248,44 @@ caching requirements:
 
 * When you *develop* a local component, you want the cache to be
   invalidated as soon as you make any changes to the code, so you
-  aren't forced to do shift-reload either. A way to look at this is
-  that you want the system to make a new version number for each and
-  every edit to the local component.
+  aren't forced to do shift-reload during development. A simple reload
+  should refresh all static resources.
+
+  A way to look at this is that you want the system to make a new
+  version number for each and every edit to the local component.
 
 To have local components, you first need a special local components
 registry::
 
-  local = bower.local_components('local')
+  local = bower.local_components('local', components)
+
+The first argument is the name of the local components registry. It is
+used in the URL. The second argument is a reference to a bower
+components directory that you've created earlier with
+``bower.components()``. The local components registry can depend on
+the components installed with Bower.
 
 You can have more than one local components registry, but typically
-you only need one per project. It does not point to a
-``bower_components`` directory to find its components. Instead, multiple
-directories can be registered into it manually.
+you only need one per project.
 
-Here's how we would add a local component called ``mycode``::
+Note that the local components registry does not point to a
+``bower_components`` directory in order to find its
+components. Instead we register individual component directories
+manually.
 
-  local.component('mycode', '/path/to/directory/mycode', version='1.1.0')
+Here's how we add a local component::
 
-XXX since 'main' is also useful, we *should* use bower.json for the name
-  and version. Though version rules are special.
+  local.component('/path/to/directory/mycode')
 
-A component is defined by a unique name (which is used in its URL),
-a path to a directory with client-side code in it that you want
-to publish under that name, and a version.
+The rest of the relevant information is in its
+``bower.json``. BowerStatic uses ``name`` and ``main`` and
+``dependencies`` just like for third party components you have
+installed with Bower. For how the version number is extracted see
+below.
+
+The name of the component should be unique within the local registry,
+as well as not conflict with any component in the Bower components
+registry.
 
 The directory with client-side code in it can have any structure. It
 could have a ``bower.json`` in it, but this is not inspected by the
