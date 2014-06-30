@@ -98,9 +98,7 @@ def load_packages(path):
 
 
 def load_package(path):
-    bower_json_filename = os.path.join(path, 'bower.json')
-    if not os.path.isfile(bower_json_filename):
-        bower_json_filename = os.path.join(path, 'component.json')
+    bower_json_filename = os.path.join(path, '.bower.json')
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
     if isinstance(data['main'], list):
