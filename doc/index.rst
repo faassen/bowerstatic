@@ -46,6 +46,8 @@ Contents
    integrating
    local
    dependencies
+   developing
+   changes
    history
 
 Indices and tables
