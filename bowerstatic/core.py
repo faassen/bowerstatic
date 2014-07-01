@@ -59,9 +59,10 @@ class ComponentCollection(object):
         for component in components.values():
             component.create_main_resource(self)
 
-    def add(self, component):
+    def add(self, component, component_collection=None):
         self._components[component.name] = component
-        component.create_main_resource(self)
+        component_collection = component_collection or self
+        component.create_main_resource(component_collection)
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
@@ -87,7 +88,6 @@ class ComponentCollection(object):
             return self.resource(path_or_resource, [])
         else:
             resource = path_or_resource
-            assert resource.component_collection is self
         return resource
 
     def get_component(self, component_name):
@@ -122,7 +122,7 @@ class LocalComponentCollection(object):
 
     def component(self, path, version):
         self.local_collection.add(
-            load_component(path, 'bower.json', version))
+            load_component(path, 'bower.json', version), self)
 
     def get_resource(self, path):
         result = self.local_collection.get_resource(path)

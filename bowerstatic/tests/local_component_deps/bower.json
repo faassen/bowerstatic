@@ -1,0 +1,24 @@
+{
+  "name": "local_component",
+  "version": "1.0",
+  "authors": [
+    "faassen <faassen@startifact.com>"
+  ],
+  "description": "A test local component",
+  "main": "local.js",
+  "moduleType": [
+    "globals"
+  ],
+  "dependencies": {
+    "jquery": ">=1.6"
+  },
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
