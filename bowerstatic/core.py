@@ -41,13 +41,13 @@ class Bower(object):
         return Injector(self, wsgi)
 
     def get_filename(self, bower_components_name,
-                     package_name, package_version, file_path):
+                     component_name, component_version, file_path):
         components_directory = self._components_directories.get(
             bower_components_name)
         if components_directory is None:
             return None
-        return components_directory.get_filename(package_name,
-                                                 package_version,
+        return components_directory.get_filename(component_name,
+                                                 component_version,
                                                  file_path)
 
 
@@ -74,10 +74,10 @@ class ComponentsDirectory(object):
         self.bower = bower
         self.name = name
         self.path = path
-        self._packages = load_packages(path)
+        self._components = load_components(path)
         self._resources = {}
-        for package in self._packages.values():
-            package.create_main_resource(self)
+        for component in self._components.values():
+            component.create_main_resource(self)
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
@@ -102,91 +102,35 @@ class ComponentsDirectory(object):
             assert resource.components_directory is self
         return resource
 
-    def get_package(self, package_name):
-        return self._packages.get(package_name)
+    def get_component(self, component_name):
+        return self._components.get(component_name)
 
-    def get_filename(self, package_name, package_version, file_path):
-        package = self._packages.get(package_name)
-        if package is None:
+    def get_filename(self, component_name, component_version, file_path):
+        component = self._components.get(component_name)
+        if component is None:
             return None
-        return package.get_filename(package_version, file_path)
-
-
-class LocalComponents(object):
-    def __init__(self, bower, name, components):
-        self.bower = bower
-        self.name = name
-        self._components = components
-        self._local = {}
-        self._resources = {}
-
-    def component(self, path, version):
-        result = LocalComponent(path, version)
-        if result.name in self._local:
-            raise Error("Duplicate name for local component: %s" % name)
-        self._local[result.name] = result
-        return result
-
-    def includer(self, environ):
-        return self._components.includer(environ)
-
-    def resource(self, path, dependencies=None):
-        dependencies = dependencies or []
-        resource = self._resources.get(path)
-        if resource is not None:
-            return resource
-        resource = self._components.get_resource(path)
-        if resource is not None:
-            return resource
-        result = Resource(self.bower, self, path, dependencies)
-        self._resources[path] = result
-        return result
-
-    def get_resource(self, path):
-        resource = self._resources.get(path)
-        if resource is not None:
-            return resource
-        return self._components.get_resource(path)
-
-    def path_to_resource(self, path_or_resource):
-        if isinstance(path_or_resource, basestring):
-            return self.resource(path_or_resource)
-        else:
-            resource = path_or_resource
-        return resource
-
-    def get_package(self, package_name):
-        local_component = self._local.get(package_name)
-        if local_component is not None:
-            return local_component.package
-        return self._components.get_package(package_name)
-
-    def get_filename(self, package_name, package_version, file_path):
-        package = self._packages.get(package_name)
-        if package is None:
-            return None
-        return package.get_filename(package_version, file_path)
+        return component.get_filename(component_version, file_path)
 
 
 class LocalComponent(object):
     def __init__(self, path, version):
         self.path = path
         self.version = version
-        self.package = load_package(path, 'bower.json')
-        self.name = self.package.name
+        self.component = load_component(path, 'bower.json')
+        self.name = self.component.name
 
-def load_packages(path):
+def load_components(path):
     result = {}
-    for package_path in os.listdir(path):
-        fullpath = os.path.join(path, package_path)
+    for component_path in os.listdir(path):
+        fullpath = os.path.join(path, component_path)
         if not os.path.isdir(fullpath):
             continue
-        package = load_package(fullpath, '.bower.json')
-        result[package.name] = package
+        component = load_component(fullpath, '.bower.json')
+        result[component.name] = component
     return result
 
 
-def load_package(path, bower_filename):
+def load_component(path, bower_filename):
     bower_json_filename = os.path.join(path, bower_filename)
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
@@ -219,10 +163,10 @@ class Component(object):
             return resource
         # create a main resource for all dependencies
         dependencies = []
-        for package_name in self.dependencies.keys():
-            package = components_directory.get_package(package_name)
+        for component_name in self.dependencies.keys():
+            component = components_directory.get_component(component_name)
             dependencies.append(
-                package.create_main_resource(components_directory))
+                component.create_main_resource(components_directory))
         # depend on those main resources in this resource
         return components_directory.resource(
             self.name, dependencies=dependencies)
@@ -248,18 +192,18 @@ class Resource(object):
 
         parts = path.split('/', 1)
         if len(parts) == 2:
-            package_name, file_path = parts
+            component_name, file_path = parts
         else:
-            package_name = parts[0]
+            component_name = parts[0]
             file_path = None
-        self.package = self.components_directory.get_package(package_name)
-        if self.package is None:
+        self.component = self.components_directory.get_component(component_name)
+        if self.component is None:
             raise Error(
                 "Component %s not known in components directory %s (%s)" % (
-                    package_name, components_directory.name,
+                    component_name, components_directory.name,
                     components_directory.path))
         if file_path is None:
-            file_path = self.package.main
+            file_path = self.component.main
         self.file_path = file_path
         dummy, self.ext = os.path.splitext(file_path)
 
@@ -267,7 +211,7 @@ class Resource(object):
         parts = [
             self.bower.publisher_signature,
             self.components_directory.name,
-            self.package.name,
-            self.package.version,
+            self.component.name,
+            self.component.version,
             self.file_path]
         return '/' + '/'.join(parts)
