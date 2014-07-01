@@ -29,21 +29,21 @@ class Publisher(object):
         bower_components_name = request.path_info_pop()
         if bower_components_name is None:
             return webob.exc.HTTPNotFound()
-        # next segment is package name
-        package_name = request.path_info_pop()
-        if package_name is None:
+        # next segment is component name
+        component_name = request.path_info_pop()
+        if component_name is None:
             return webob.exc.HTTPNotFound()
-        # next segment is package version
-        package_version = request.path_info_pop()
-        if package_version is None:
+        # next segment is component version
+        component_version = request.path_info_pop()
+        if component_version is None:
             return webob.exc.HTTPNotFound()
-        # the rest of the path goes into package
+        # the rest of the path goes into component
         file_path = request.path_info.lstrip('/')
         if file_path.strip() == '':
             return webob.exc.HTTPNotFound()
         filename = self.bower.get_filename(bower_components_name,
-                                           package_name,
-                                           package_version,
+                                           component_name,
+                                           component_version,
                                            file_path)
         if filename is None:
             return webob.exc.HTTPNotFound()

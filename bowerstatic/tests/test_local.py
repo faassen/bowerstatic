@@ -4,7 +4,6 @@ import os
 import pytest
 
 
-@pytest.mark.xfail
 def test_local_falls_back_to_components():
     bower = bowerstatic.Bower()
 
@@ -33,7 +32,7 @@ def test_local_falls_back_to_components():
     response = c.get('/bowerstatic/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
 
-@pytest.mark.xfail
+
 def test_local_with_local_component():
     bower = bowerstatic.Bower()
 
@@ -64,5 +63,5 @@ def test_local_with_local_component():
         b'src="/bowerstatic/local/local_component/2.0/local.js">'
         b'</script></head><body>Hello!</body></html>')
 
-    response = c.get('/bowerstatic/local/local_component/local.js')
-    assert response.body == b'/* jquery.js 2.1.1 */\n'
+    response = c.get('/bowerstatic/local/local_component/2.0/local.js')
+    assert response.body == b'/* this is local.js */\n'

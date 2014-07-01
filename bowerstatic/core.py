@@ -15,7 +15,6 @@ class Bower(object):
     def __init__(self, publisher_signature='bowerstatic'):
         self.publisher_signature = publisher_signature
         self._component_collections = {}
-        self._local = {}
 
     def components(self, name, path):
         if name in self._component_collections:
@@ -25,10 +24,10 @@ class Bower(object):
         return result
 
     def local_components(self, name, component_collection):
-        if name in self._local:
+        if name in self._component_collections:
             raise Error("Duplicate name for local components: %s" % name)
-        result = LocalComponents(self, name, component_collection)
-        self._local[name] = result
+        result = LocalComponentCollection(self, name, component_collection)
+        self._component_collections[name] = result
         return result
 
     def wrap(self, wsgi):
@@ -57,8 +56,12 @@ class ComponentCollection(object):
         self.name = name
         self._components = components
         self._resources = {}
-        for component in self._components.values():
+        for component in components.values():
             component.create_main_resource(self)
+
+    def add(self, component):
+        self._components[component.name] = component
+        component.create_main_resource(self)
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
@@ -68,7 +71,9 @@ class ComponentCollection(object):
         resource = self._resources.get(path)
         if resource is not None:
             return resource
-        result = Resource(self.bower, self, path, dependencies)
+        result = create_resource(self.bower, self, path, dependencies)
+        if result is None:
+            return None
         self._resources[path] = result
         return result
 
@@ -77,7 +82,7 @@ class ComponentCollection(object):
 
     def path_to_resource(self, path_or_resource):
         if isinstance(path_or_resource, basestring):
-            return self.resource(path_or_resource)
+            return self.resource(path_or_resource, [])
         else:
             resource = path_or_resource
             assert resource.component_collection is self
@@ -93,12 +98,56 @@ class ComponentCollection(object):
         return component.get_filename(component_version, file_path)
 
 
-class LocalComponent(object):
-    def __init__(self, path, version):
-        self.path = path
-        self.version = version
-        self.component = load_component(path, 'bower.json')
-        self.name = self.component.name
+class LocalComponentCollection(object):
+    def __init__(self, bower, name, component_collection):
+        self.bower = bower
+        self.name = name
+        self.local_collection = ComponentCollection(bower, name, {})
+        self.component_collection = component_collection
+
+    def local(self, path, version):
+        self.local_collection.add(load_component(path, 'bower.json', version))
+
+    def includer(self, environ):
+        return Includer(self.bower, self, environ)
+
+    def resource(self, path, dependencies=None):
+        dependencies = dependencies or []
+        result = self.local_collection.resource(path, dependencies)
+        if result is not None:
+            return result
+        return self.component_collection.resource(path, dependencies)
+
+    def component(self, path, version):
+        self.local_collection.add(
+            load_component(path, 'bower.json', version))
+
+    def get_resource(self, path):
+        result = self.local_collection.get_resource(path)
+        if result is not None:
+            return result
+        return self.component_collection.get_resource(path)
+
+    def path_to_resource(self, path_or_resource):
+        result = self.local_collection.path_to_resource(path_or_resource)
+        if result is not None:
+            return result
+        return self.component_collection.path_to_resource(path_or_resource)
+
+    def get_component(self, component_name):
+        result = self.local_collection.get_component(component_name)
+        if result is not None:
+            return result
+        return self.component_collection.get_component(component_name)
+
+    def get_filename(self, component_name, component_version, file_path):
+        result = self.local_collection.get_filename(
+            component_name, component_version, file_path)
+        if result is not None:
+            return result
+        return self.component_collection.get_filename(
+            component_name, component_version, file_path)
+
 
 def load_components(path):
     result = {}
@@ -111,7 +160,7 @@ def load_components(path):
     return result
 
 
-def load_component(path, bower_filename):
+def load_component(path, bower_filename, version=None):
     bower_json_filename = os.path.join(path, bower_filename)
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
@@ -122,9 +171,10 @@ def load_component(path, bower_filename):
     dependencies = data.get('dependencies')
     if dependencies is None:
         dependencies = {}
+    version = version or data['version']
     return Component(path,
                      data['name'],
-                     data['version'],
+                     version,
                      main,
                      dependencies)
 
@@ -162,30 +212,32 @@ class Component(object):
         return filename
 
 
+def create_resource(bower, component_collection, path, dependencies):
+    dependencies = [
+        component_collection.path_to_resource(dependency) for
+        dependency in dependencies]
+    parts = path.split('/', 1)
+    if len(parts) == 2:
+        component_name, file_path = parts
+    else:
+        component_name = parts[0]
+        file_path = None
+    component = component_collection.get_component(component_name)
+    if component is None:
+        return None
+    if file_path is None:
+        file_path = component.main
+    return Resource(bower, component_collection,
+                    component, file_path, dependencies)
+
 class Resource(object):
-    def __init__(self, bower, component_collection, path, dependencies):
+    def __init__(self, bower, component_collection,
+                 component, file_path, dependencies):
         self.bower = bower
         self.component_collection = component_collection
-        self.path = path
-        self.dependencies = [
-            component_collection.path_to_resource(dependency) for
-            dependency in dependencies]
-
-        parts = path.split('/', 1)
-        if len(parts) == 2:
-            component_name, file_path = parts
-        else:
-            component_name = parts[0]
-            file_path = None
-        self.component = component_collection.get_component(component_name)
-        if self.component is None:
-            raise Error(
-                "Component %s not known in components directory %s (%s)" % (
-                    component_name, component_collection.name,
-                    component_collection))
-        if file_path is None:
-            file_path = self.component.main
+        self.component = component
         self.file_path = file_path
+        self.dependencies = dependencies
         dummy, self.ext = os.path.splitext(file_path)
 
     def url(self):
