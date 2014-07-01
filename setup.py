@@ -1,10 +1,10 @@
 import os
 from setuptools import setup, find_packages
 
-# long_description = (
-#     open('README.rst').read()
-#     + '\n' +
-#     open('CHANGES.txt').read())
+long_description = (
+    open('README.rst').read()
+    + '\n' +
+    open('CHANGES.txt').read())
 
 tests_require = [
     'pytest >= 2.0',
@@ -14,10 +14,12 @@ tests_require = [
 
 setup(name='bowerstatic',
       version='0.1.dev0',
-      description="A Bower-centric static file server",
+      description="A Bower-centric static file server for WSGI",
+      long_description=long_description,
       author="Martijn Faassen",
       author_email="faassen@startifact.com",
       license="BSD",
+      keywords='wsgi bower',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
