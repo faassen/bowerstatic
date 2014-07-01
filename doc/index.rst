@@ -10,11 +10,13 @@ Bower_ package manager.
 
 .. _Bower: http://bower.io/
 
+.. _Fanstatic: http://fanstatic.org
+
 Features:
 
 * Integrates with any WSGI-based project.
 
-* Easily serve Bower-managed directories.
+* Easily serve Bower-managed ``bower_components`` directories.
 
 * Easily say in Python code you want to include a static resource,
   which are then automatically inserted in any HTML page you
@@ -41,8 +43,10 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   tutorial
+   integrating
+   local
    dependencies
+   history
 
 Indices and tables
 ------------------
