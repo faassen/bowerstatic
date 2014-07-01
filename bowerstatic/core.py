@@ -15,12 +15,20 @@ class Bower(object):
     def __init__(self, publisher_signature='bowerstatic'):
         self.publisher_signature = publisher_signature
         self._components_directories = {}
+        self._local = {}
 
     def components(self, name, path):
         if name in self._components_directories:
             raise Error("Duplicate name for components directory: %s" % name)
         result = ComponentsDirectory(self, name, path)
         self._components_directories[name] = result
+        return result
+
+    def local_components(self, name, components_directory):
+        if name in self._local:
+            raise Error("Duplicate name for local components: %s" % name)
+        result = LocalComponents(self, name, components_directory)
+        self._local[name] = result
         return result
 
     def wrap(self, wsgi):
@@ -42,6 +50,24 @@ class Bower(object):
                                                  package_version,
                                                  file_path)
 
+
+class ComponentCollection(object):
+    def __init__(self, bower, name):
+        self.bower = bower
+        self.name = name
+        self._resources = {}
+
+    def includer(self, environ):
+        return Includer(self.bower, self, environ)
+
+    def resource(self, path, dependencies=None):
+        dependencies = dependencies or []
+        resource = self._resources.get(path)
+        if resource is not None:
+            return resource
+        result = Resource(self.bower, self, path, dependencies)
+        self._resources[path] = result
+        return result
 
 class ComponentsDirectory(object):
     def __init__(self, bower, name, path):
@@ -86,19 +112,82 @@ class ComponentsDirectory(object):
         return package.get_filename(package_version, file_path)
 
 
+class LocalComponents(object):
+    def __init__(self, bower, name, components):
+        self.bower = bower
+        self.name = name
+        self._components = components
+        self._local = {}
+        self._resources = {}
+
+    def component(self, path, version):
+        result = LocalComponent(path, version)
+        if result.name in self._local:
+            raise Error("Duplicate name for local component: %s" % name)
+        self._local[result.name] = result
+        return result
+
+    def includer(self, environ):
+        return self._components.includer(environ)
+
+    def resource(self, path, dependencies=None):
+        dependencies = dependencies or []
+        resource = self._resources.get(path)
+        if resource is not None:
+            return resource
+        resource = self._components.get_resource(path)
+        if resource is not None:
+            return resource
+        result = Resource(self.bower, self, path, dependencies)
+        self._resources[path] = result
+        return result
+
+    def get_resource(self, path):
+        resource = self._resources.get(path)
+        if resource is not None:
+            return resource
+        return self._components.get_resource(path)
+
+    def path_to_resource(self, path_or_resource):
+        if isinstance(path_or_resource, basestring):
+            return self.resource(path_or_resource)
+        else:
+            resource = path_or_resource
+        return resource
+
+    def get_package(self, package_name):
+        local_component = self._local.get(package_name)
+        if local_component is not None:
+            return local_component.package
+        return self._components.get_package(package_name)
+
+    def get_filename(self, package_name, package_version, file_path):
+        package = self._packages.get(package_name)
+        if package is None:
+            return None
+        return package.get_filename(package_version, file_path)
+
+
+class LocalComponent(object):
+    def __init__(self, path, version):
+        self.path = path
+        self.version = version
+        self.package = load_package(path, 'bower.json')
+        self.name = self.package.name
+
 def load_packages(path):
     result = {}
     for package_path in os.listdir(path):
         fullpath = os.path.join(path, package_path)
         if not os.path.isdir(fullpath):
             continue
-        package = load_package(fullpath)
+        package = load_package(fullpath, '.bower.json')
         result[package.name] = package
     return result
 
 
-def load_package(path):
-    bower_json_filename = os.path.join(path, '.bower.json')
+def load_package(path, bower_filename):
+    bower_json_filename = os.path.join(path, bower_filename)
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
     if isinstance(data['main'], list):
@@ -165,7 +254,7 @@ class Resource(object):
             file_path = None
         self.package = self.components_directory.get_package(package_name)
         if self.package is None:
-            raise InclusionError(
+            raise Error(
                 "Package %s not known in components directory %s (%s)" % (
                     package_name, components_directory.name,
                     components_directory.path))
