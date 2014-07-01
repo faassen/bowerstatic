@@ -20,7 +20,7 @@ class Bower(object):
     def components(self, name, path):
         if name in self._component_collections:
             raise Error("Duplicate name for components directory: %s" % name)
-        result = ComponentCollection(self, name, path)
+        result = ComponentCollection(self, name, load_components(path))
         self._component_collections[name] = result
         return result
 
@@ -51,30 +51,11 @@ class Bower(object):
                                                  file_path)
 
 
-# class ComponentCollection(object):
-#     def __init__(self, bower, name):
-#         self.bower = bower
-#         self.name = name
-#         self._resources = {}
-
-#     def includer(self, environ):
-#         return Includer(self.bower, self, environ)
-
-#     def resource(self, path, dependencies=None):
-#         dependencies = dependencies or []
-#         resource = self._resources.get(path)
-#         if resource is not None:
-#             return resource
-#         result = Resource(self.bower, self, path, dependencies)
-#         self._resources[path] = result
-#         return result
-
 class ComponentCollection(object):
-    def __init__(self, bower, name, path):
+    def __init__(self, bower, name, components):
         self.bower = bower
         self.name = name
-        self.path = path
-        self._components = load_components(path)
+        self._components = components
         self._resources = {}
         for component in self._components.values():
             component.create_main_resource(self)
