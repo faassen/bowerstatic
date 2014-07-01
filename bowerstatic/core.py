@@ -66,12 +66,14 @@ class ComponentCollection(object):
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
-    def resource(self, path, dependencies=None):
+    def resource(self, path, dependencies=None, component_collection=None):
         dependencies = dependencies or []
         resource = self._resources.get(path)
         if resource is not None:
             return resource
-        result = create_resource(self.bower, self, path, dependencies)
+        component_collection = component_collection or self
+        result = create_resource(self.bower, component_collection,
+                                 path, dependencies)
         if result is None:
             return None
         self._resources[path] = result
@@ -113,7 +115,7 @@ class LocalComponentCollection(object):
 
     def resource(self, path, dependencies=None):
         dependencies = dependencies or []
-        result = self.local_collection.resource(path, dependencies)
+        result = self.local_collection.resource(path, dependencies, self)
         if result is not None:
             return result
         return self.component_collection.resource(path, dependencies)
