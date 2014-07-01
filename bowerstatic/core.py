@@ -197,14 +197,14 @@ def load_package(path, bower_filename):
     dependencies = data.get('dependencies')
     if dependencies is None:
         dependencies = {}
-    return Package(path,
-                   data['name'],
-                   data['version'],
-                   main,
-                   dependencies)
+    return Component(path,
+                     data['name'],
+                     data['version'],
+                     main,
+                     dependencies)
 
 
-class Package(object):
+class Component(object):
     def __init__(self, path, name, version, main, dependencies):
         self.path = path
         self.name = name
@@ -255,7 +255,7 @@ class Resource(object):
         self.package = self.components_directory.get_package(package_name)
         if self.package is None:
             raise Error(
-                "Package %s not known in components directory %s (%s)" % (
+                "Component %s not known in components directory %s (%s)" % (
                     package_name, components_directory.name,
                     components_directory.path))
         if file_path is None:
