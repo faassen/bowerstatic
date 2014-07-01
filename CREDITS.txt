@@ -1,0 +1,8 @@
+CREDITS
+=======
+
+* Martijn Faassen (creator and main developer)
+
+* Special thanks to the Fanstatic developers.
+
+* Special thanks to CONTACT software.
