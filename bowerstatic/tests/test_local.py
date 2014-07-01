@@ -1,7 +1,6 @@
 import bowerstatic
 from webtest import TestApp as Client
 import os
-import pytest
 
 
 def test_local_falls_back_to_components():
@@ -212,4 +211,3 @@ def test_local_bower_json_dependencies():
         b'<script type="text/javascript" '
         b'src="/bowerstatic/local/local_component/2.0/local.js"></script>'
         b'</head><body>Hello!</body></html>')
-

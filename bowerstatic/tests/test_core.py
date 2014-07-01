@@ -1,7 +1,6 @@
 import bowerstatic
 from webtest import TestApp as Client
 import os
-import pytest
 
 
 def test_wrap():

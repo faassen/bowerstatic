@@ -232,6 +232,7 @@ def create_resource(bower, component_collection, path, dependencies):
     return Resource(bower, component_collection,
                     component, file_path, dependencies)
 
+
 class Resource(object):
     def __init__(self, bower, component_collection,
                  component, file_path, dependencies):

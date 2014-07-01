@@ -1,4 +1,3 @@
-import os
 from toposort import topological_sort
 
 
@@ -57,7 +56,6 @@ class ResourceInclusion(Inclusion):
 
     def __ne__(self, other):
         return self.resource is not other.resource
-
 
     def dependencies(self):
         return [ResourceInclusion(resource)
