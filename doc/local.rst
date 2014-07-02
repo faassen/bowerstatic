@@ -35,7 +35,7 @@ caching requirements:
 Usage
 -----
 
-To have local components, you first to create a special local
+To have local components, you first have to create a special local
 components registry::
 
   local = bower.local_components('local', components)
@@ -47,7 +47,7 @@ The first argument is the name of the local components registry. It is
 used in the URL.
 
 The second argument is a components object for a ``bower_components``
-directory, created before with ``bower.components()``. This makes all
+directory, created earlier with ``bower.components()``. This makes all
 those bower components available in the local component registry, so
 that the local components can depend on them.
 
