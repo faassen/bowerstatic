@@ -1,3 +1,3 @@
 # flake8: noqa
-from .core import Bower, Error
-from .includer import InclusionError
+from .core import Bower
+from .error import Error

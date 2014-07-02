@@ -82,6 +82,18 @@ later.
 Including Static Resources in a HTML page
 -----------------------------------------
 
+.. sidebar:: Errors
+
+  If you try to include a component that was not installed, you get an
+  ``bowerstatic.Error`` exception. The ``bower_components`` directory
+  is read during startup, so if you just installed that component
+  using ``bower install``, you need to restart the server.
+
+  If you try to refer to a refer to a file in a component that does
+  not exist you also get an ``bowerstatic.Error`` exception. If that
+  file then gets added (through a ``bower upgrade`` or if it's in a
+  local component) it will be found without the need for a restart.
+
 Now that we have a ``components`` object we can start including static
 resources from these components in a HTML page. BowerStatic provides
 an easy, automatic way for you to do this from Python.

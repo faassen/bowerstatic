@@ -91,6 +91,66 @@ def test_injector_specific_path_wrong_file_then_added(tmpdir):
         b'</script></head><body>Hello!</body></html>')
 
 
+def test_injector_wrong_component():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        with pytest.raises(bowerstatic.Error):
+            include('nonexistent/nonexistent.js')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    c.get('/')
+
+
+@pytest.mark.xfail
+def test_injector_wrong_component_then_added(tmpdir):
+    bower_components_dir = tmpdir.mkdir('bower_components')
+
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', bower_components_dir.strpath)
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('component/main.js')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    with pytest.raises(bowerstatic.Error):
+        c.get('/')
+
+    # now add the component
+    component_dir = bower_components_dir.mkdir('component')
+    bower_json_file = component_dir.join('.bower.json')
+    bower_json_file.write(json.dumps({
+        'name': 'component',
+        'version': '2.1',
+        'main': 'main.js'
+    }))
+    main_js_file = component_dir.join('main.js')
+    main_js_file.write('/* this is main.js */')
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/component/2.1/main.js">'
+        b'</script></head><body>Hello!</body></html>')
+
+
 
 def test_injector_specific_resource():
     bower = bowerstatic.Bower()

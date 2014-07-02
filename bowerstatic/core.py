@@ -4,10 +4,7 @@ from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
 from .autoversion import autoversion
-
-
-class Error(Exception):
-    pass
+from .error import Error
 
 
 class Bower(object):
