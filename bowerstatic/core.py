@@ -235,6 +235,10 @@ def create_resource(bower, component_collection, path, dependencies):
         return None
     if file_path is None:
         file_path = component.main
+    fullpath = os.path.join(component.path, file_path)
+    if not os.path.exists(fullpath):
+        raise Error("resource path %s - cannot find resource file: %s" %
+                    (path, fullpath))
     return Resource(bower, component_collection,
                     component, file_path, dependencies)
 
