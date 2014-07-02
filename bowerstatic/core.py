@@ -3,6 +3,7 @@ import json
 from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
+from .autoversion import autoversion
 
 
 class Error(Exception):
@@ -107,9 +108,6 @@ class LocalComponentCollection(object):
         self.local_collection = ComponentCollection(bower, name, {})
         self.component_collection = component_collection
 
-    def local(self, path, version):
-        self.local_collection.add(load_component(path, 'bower.json', version))
-
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
@@ -122,7 +120,7 @@ class LocalComponentCollection(object):
 
     def component(self, path, version):
         self.local_collection.add(
-            load_component(path, 'bower.json', version), self)
+            load_component(path, 'bower.json', version, version is None), self)
 
     def get_resource(self, path):
         result = self.local_collection.get_resource(path)
@@ -162,7 +160,7 @@ def load_components(path):
     return result
 
 
-def load_component(path, bower_filename, version=None):
+def load_component(path, bower_filename, version=None, autoversion=False):
     bower_json_filename = os.path.join(path, bower_filename)
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
@@ -178,16 +176,24 @@ def load_component(path, bower_filename, version=None):
                      data['name'],
                      version,
                      main,
-                     dependencies)
+                     dependencies,
+                     autoversion=autoversion)
 
 
 class Component(object):
-    def __init__(self, path, name, version, main, dependencies):
+    def __init__(self, path, name, version, main, dependencies, autoversion):
         self.path = path
         self.name = name
-        self.version = version
+        self._version = version
         self.main = main
         self.dependencies = dependencies
+        self.autoversion = autoversion
+
+    @property
+    def version(self):
+        if not self.autoversion:
+            return self._version
+        return autoversion(self.path)
 
     def create_main_resource(self, component_collection):
         # if the resource was already created, return it
