@@ -101,9 +101,9 @@ an easy, automatic way for you to do this from Python.
 Using the ``components`` object we created earlier for a
 ``bower_components`` directory, you create a ``include`` function::
 
-.. sidebar:: WSGI environ
-
   include = components.includer(environ)
+
+.. sidebar:: WSGI environ
 
   BowerStatic's includer system needs to interact with the WSGI
   ``environ`` object. If your WSGI-based web framework has a
