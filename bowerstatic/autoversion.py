@@ -1,6 +1,5 @@
 from datetime import datetime
 import os
-import hashlib
 
 
 VCS_NAMES = ['.svn', '.git', '.bzr', '.hg']

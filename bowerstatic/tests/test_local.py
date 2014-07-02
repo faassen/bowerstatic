@@ -1,7 +1,6 @@
 import bowerstatic
 from webtest import TestApp as Client
 import os
-import tempfile
 import json
 from datetime import datetime, timedelta
 
@@ -226,7 +225,7 @@ def test_local_with_auto_version(tmpdir):
     bower_json_file = component_dir.join('bower.json')
     bower_json_file.write(json.dumps({
         'name': 'component',
-        'version': '2.1', #  should be ignored
+        'version': '2.1',  # should be ignored
         'main': 'main.js'
     }))
     main_js_file = component_dir.join('main.js')
