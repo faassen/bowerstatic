@@ -4,8 +4,9 @@ CHANGES
 0.2 (unreleased)
 ================
 
-- Nothing changed yet.
-
+- Even if the same resource is included multiple times, it will only
+  be included once. Thanks Ying Zhong for the bug report and suggested
+  fix.
 
 0.1 (2014-07-07)
 ================

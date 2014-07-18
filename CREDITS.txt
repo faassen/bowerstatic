@@ -3,6 +3,8 @@ CREDITS
 
 * Martijn Faassen (creator and main developer)
 
+* Ying Zhong (bug reporting)
+
 * Reinout van Rees (a few doc fixes)
 
 * Special thanks to the Fanstatic developers.
