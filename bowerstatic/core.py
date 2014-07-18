@@ -246,6 +246,8 @@ class Resource(object):
         self.bower = bower
         self.component_collection = component_collection
         self.component = component
+        if file_path.startswith('./'):
+            file_path = file_path[2:]
         self.file_path = file_path
         self.dependencies = dependencies
         dummy, self.ext = os.path.splitext(file_path)
