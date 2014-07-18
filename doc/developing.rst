@@ -19,7 +19,9 @@ guarantees a clean one. Note that we skip activating the environment
 here, as this is just needed to initially bootstrap the BowerStatic
 buildout.
 
-Clone BowerStatic from github and go to the ``bowerstatic`` directory::
+.. _github: https://github.com/faassen/bowerstatic
+
+Clone BowerStatic from github_ and go to the ``bowerstatic`` directory::
 
   $ git clone git@github.com:faassen/bowerstatic.git
   $ cd bowerstatic

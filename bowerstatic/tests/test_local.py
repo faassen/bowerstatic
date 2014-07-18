@@ -1,6 +1,8 @@
 import bowerstatic
 from webtest import TestApp as Client
 import os
+import json
+from datetime import datetime, timedelta
 
 
 def test_local_falls_back_to_components():
@@ -211,3 +213,83 @@ def test_local_bower_json_dependencies():
         b'<script type="text/javascript" '
         b'src="/bowerstatic/local/local_component/2.0/local.js"></script>'
         b'</head><body>Hello!</body></html>')
+
+
+def test_local_with_auto_version(tmpdir):
+    # need to cut things a bit of slack, as filesystem time can apparently
+    # be ahead slightly
+    after_dt = datetime.now() - timedelta(seconds=1)
+
+    # create a bower component directory
+    component_dir = tmpdir.mkdir('component')
+    bower_json_file = component_dir.join('bower.json')
+    bower_json_file.write(json.dumps({
+        'name': 'component',
+        'version': '2.1',  # should be ignored
+        'main': 'main.js'
+    }))
+    main_js_file = component_dir.join('main.js')
+    main_js_file.write('/* this is main.js */')
+
+    # now expose it through local
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    local = bower.local_components('local', components)
+
+    local.component(component_dir.strpath, version=None)
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = local.includer(environ)
+        include('component/main.js')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    wrapped = bower.wrap(wsgi)
+
+    c = Client(wrapped)
+
+    response = c.get('/')
+    before_dt = datetime.now()
+
+    def get_url_dt(response):
+        s = unicode(response.body, 'UTF-8')
+        start = s.find('src="') + len('src="')
+        end = s.find('"', start)
+        url = s[start:end]
+        parts = url.split('/')
+        url_dt_str = parts[4]
+        url_dt = datetime.strptime(url_dt_str, '%Y-%m-%dT%H:%M:%S.%f')
+        return url_dt_str, url_dt
+
+    url_dt_str, url_dt = get_url_dt(response)
+
+    assert url_dt >= after_dt
+    assert url_dt <= before_dt
+
+    response = c.get('/bowerstatic/local/component/%s/main.js' % url_dt_str)
+    assert response.body == b'/* this is main.js */'
+
+    after_dt = datetime.now() - timedelta(seconds=1)
+
+    # now we modify a file
+    main_js_file.write('/* this is main.js, modified */')
+
+    response = c.get('/')
+
+    before_dt = datetime.now()
+
+    original_url_dt_str, original_url_dt = url_dt_str, url_dt
+    url_dt_str, url_dt = get_url_dt(response)
+    assert original_url_dt_str != url_dt_str
+    assert url_dt >= after_dt
+    assert url_dt <= before_dt
+    assert url_dt > original_url_dt
+
+    c.get('/bowerstatic/local/component/%s/main.js' % original_url_dt_str,
+          status=404)
+    response = c.get('/bowerstatic/local/component/%s/main.js' %
+                     url_dt_str)
+    assert response.body == b'/* this is main.js, modified */'

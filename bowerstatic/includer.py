@@ -1,8 +1,5 @@
 from toposort import topological_sort
-
-
-class InclusionError(Exception):
-    pass
+from .error import Error
 
 
 class Includer(object):
@@ -13,6 +10,9 @@ class Includer(object):
 
     def __call__(self, path_or_resource):
         resource = self.components_directory.path_to_resource(path_or_resource)
+        if resource is None:
+            raise Error("Cannot find component for path (need restart?): %s" %
+                        path_or_resource)
         self.add(ResourceInclusion(resource))
 
     def add(self, inclusion):

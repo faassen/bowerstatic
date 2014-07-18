@@ -1,4 +1,3 @@
-import os
 from setuptools import setup, find_packages
 
 long_description = (
@@ -12,23 +11,25 @@ tests_require = [
     'WebTest >= 2.0.14',
     ]
 
-setup(name='bowerstatic',
-      version='0.1.dev0',
-      description="A Bower-centric static file server for WSGI",
-      long_description=long_description,
-      author="Martijn Faassen",
-      author_email="faassen@startifact.com",
-      license="BSD",
-      keywords='wsgi bower',
-      packages=find_packages(),
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=[
-          'setuptools',
-          'WebOb',
-        ],
-      tests_require=tests_require,
-      extras_require = dict(
+setup(
+    name='bowerstatic',
+    version='0.2.dev0',
+    description="A Bower-centric static file server for WSGI",
+    long_description=long_description,
+    author="Martijn Faassen",
+    author_email="faassen@startifact.com",
+    license="BSD",
+    url='http://bowerstatic.readthedocs.org',
+    keywords='wsgi bower',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[
+        'setuptools',
+        'WebOb',
+    ],
+    tests_require=tests_require,
+    extras_require=dict(
         test=tests_require,
-        )
-      )
+    )
+)
