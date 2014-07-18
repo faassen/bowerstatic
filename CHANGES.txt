@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.2 (unreleased)
+0.2 (2014-07-18)
 ================
 
 - Even if the same resource is included multiple times, it will only
