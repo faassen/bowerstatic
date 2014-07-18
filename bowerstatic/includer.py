@@ -51,6 +51,9 @@ class ResourceInclusion(Inclusion):
         return ('<bowerstatic.includer.ResourceInclusion for %s>' %
                 self.resource.path)
 
+    def __hash__(self):
+        return hash(self.resource)
+
     def __eq__(self, other):
         return self.resource is other.resource
 

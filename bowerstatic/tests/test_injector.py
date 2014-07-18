@@ -250,6 +250,33 @@ def test_injector_no_inclusions():
     assert response.body == b'<html><head></head><body>Hello!</body></html>'
 
 
+def test_injector_multiple_identical_inclusions():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery')
+        include('jquery')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    assert response.body == (
+        b'<html><head>'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
+        b'</script></head><body>Hello!</body></html>')
+
+
+
 def test_injector_no_head_to_inject():
     bower = bowerstatic.Bower()
 
@@ -267,6 +294,7 @@ def test_injector_no_head_to_inject():
     c = Client(injector)
 
     response = c.get('/')
+
     assert response.body == b'<html><body>Hello!</body></html>'
 
 
