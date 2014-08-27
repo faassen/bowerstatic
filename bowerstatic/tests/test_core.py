@@ -28,3 +28,13 @@ def test_wrap():
 
     response = c.get('/bowerstatic/components/jquery/2.1.1/dist/jquery.js')
     assert response.body == b'/* jquery.js 2.1.1 */\n'
+
+
+def test_component_url():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    assert (components.component('jquery').url() ==
+            '/bowerstatic/components/jquery/2.1.1')

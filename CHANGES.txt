@@ -14,6 +14,12 @@ CHANGES
   instead of creating a single resource for a path, a list of
   resources is created everywhere. Fixes #6 (and was mentioned in #5).
 
+- Introduce a ``component(name)`` method on the components
+  object. Given a component name it will give an object that has a
+  ``url()`` method.  This can be used to obtain the URL of a component
+  directory, which is sometimes useful when client-side code needs to
+  construct URLs itself, such as for templates. Fixes issue #8.
+
 0.2 (2014-07-18)
 ================
 

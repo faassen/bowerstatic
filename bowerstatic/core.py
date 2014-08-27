@@ -80,6 +80,12 @@ class ComponentCollection(object):
 
     resource = resources
 
+    def component(self, component_name):
+        component = self.get_component(component_name)
+        if component is None:
+            return None
+        return UrlComponent(self.bower, self, component)
+
     def get_resources(self, path):
         return self._resources.get(path)
 
@@ -260,16 +266,29 @@ def create_resources(bower, component_collection, path, dependencies):
     for dependency in dependencies:
         dependency_resources.extend(
             component_collection.path_to_resources(dependency))
-    return [Resource(bower, component_collection, component,
+    return [Resource(UrlComponent(bower, component_collection, component),
                      file_path, dependency_resources) for file_path
             in file_paths]
 
 
-class Resource(object):
-    def __init__(self, bower, component_collection,
-                 component, file_path, dependencies):
+class UrlComponent(object):
+    def __init__(self, bower, component_collection, component):
         self.bower = bower
         self.component_collection = component_collection
+        self.component = component
+
+    def url(self):
+        parts = [
+            self.bower.publisher_signature,
+            self.component_collection.name,
+            self.component.name,
+            self.component.version,
+        ]
+        return '/' + '/'.join(parts)
+
+
+class Resource(object):
+    def __init__(self, component, file_path, dependencies):
         self.component = component
         if file_path.startswith('./'):
             file_path = file_path[2:]
@@ -278,10 +297,4 @@ class Resource(object):
         dummy, self.ext = os.path.splitext(file_path)
 
     def url(self):
-        parts = [
-            self.bower.publisher_signature,
-            self.component_collection.name,
-            self.component.name,
-            self.component.version,
-            self.file_path]
-        return '/' + '/'.join(parts)
+        return self.component.url() + '/' + self.file_path
