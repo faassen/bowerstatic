@@ -83,13 +83,13 @@ class ComponentCollection(object):
     def get_resources(self, path):
         return self._resources.get(path)
 
-    def path_to_resources(self, path_or_resource):
-        if isinstance(path_or_resource, basestring):
-            resources = self.resources(path_or_resource, [])
-        elif isinstance(path_or_resource, list):
-            resources = path_or_resource
+    def path_to_resources(self, path_or_resources):
+        if isinstance(path_or_resources, basestring):
+            resources = self.resources(path_or_resources, [])
+        elif isinstance(path_or_resources, list):
+            resources = path_or_resources
         else:
-            resources = [path_or_resource]
+            resources = [path_or_resources]
         if resources is None:
             return None
         return resources
@@ -133,11 +133,11 @@ class LocalComponentCollection(object):
             return result
         return self.component_collection.get_resources(path)
 
-    def path_to_resources(self, path_or_resource):
-        result = self.local_collection.path_to_resources(path_or_resource)
+    def path_to_resources(self, path_or_resources):
+        result = self.local_collection.path_to_resources(path_or_resources)
         if result is not None:
             return result
-        return self.component_collection.path_to_resources(path_or_resource)
+        return self.component_collection.path_to_resources(path_or_resources)
 
     def get_component(self, component_name):
         result = self.local_collection.get_component(component_name)

@@ -8,12 +8,12 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, path_or_resource):
+    def __call__(self, path_or_resources):
         resources = self.components_directory.path_to_resources(
-            path_or_resource)
+            path_or_resources)
         if resources is None:
             raise Error("Cannot find component for path (need restart?): %s" %
-                        path_or_resource)
+                        path_or_resources)
         for resource in resources:
             self.add(ResourceInclusion(resource))
 
