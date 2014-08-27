@@ -202,8 +202,6 @@ def test_injector_endpoint_path():
         b'</script></head><body>Hello!</body></html>')
 
 
-
-@pytest.mark.xfail
 def test_injector_endpoint_main_missing():
     bower = bowerstatic.Bower()
 
