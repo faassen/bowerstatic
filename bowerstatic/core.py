@@ -166,11 +166,11 @@ def load_component(path, bower_filename, version=None, autoversion=False):
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
     if 'main' not in data:
-        return None
+        main = []
     elif isinstance(data['main'], list):
-        main = data['main'][0]
-    else:
         main = data['main']
+    else:
+        main = [data['main']]
     dependencies = data.get('dependencies')
     if dependencies is None:
         dependencies = {}
@@ -223,7 +223,7 @@ class Component(object):
         return filename
 
 
-def create_resource(bower, component_collection, path, dependencies):
+def get_component_and_filepaths(component_collection, path):
     parts = path.split('/', 1)
     if len(parts) == 2:
         component_name, file_path = parts
@@ -234,11 +234,25 @@ def create_resource(bower, component_collection, path, dependencies):
     if component is None:
         return None
     if file_path is None:
-        file_path = component.main
-    fullpath = os.path.join(component.path, file_path)
-    if not os.path.exists(fullpath):
-        raise Error("resource path %s - cannot find resource file: %s" %
-                    (path, fullpath))
+        file_paths = component.main
+    else:
+        file_paths = [file_path]
+    for file_path in file_paths:
+        full_path = os.path.join(component.path, file_path)
+        if not os.path.exists(full_path):
+            raise Error("resource path %s - cannot find resource file: %s" %
+                        (path, full_path))
+    return component, file_paths
+
+
+def create_resource(bower, component_collection, path, dependencies):
+    info = get_component_and_filepaths(component_collection, path)
+    if info is None:
+        return None
+    component, file_paths = info
+    if not file_paths:
+        return None
+    file_path = file_paths[0]
     dependency_resources = []
     for dependency in dependencies:
         dependency_resources.extend(
