@@ -4,6 +4,16 @@ CHANGES
 0.3 (unreleased)
 ================
 
+- BowerStatic failed to initialize if a component was discovered
+  without a ``main``. These are handled now -- if you try to include a
+  path to such a resource, no extra inclusions are generated. Fixes #5.
+
+- If ``main`` was an array, only the first such resource was
+  loaded. The correct behavior should be to load all these
+  resources. This required a reworking of how resources get created;
+  instead of creating a single resource for a path, a list of
+  resources is created everywhere. Fixes #6 (and was mentioned in #5).
+
 0.2 (2014-07-18)
 ================
 
