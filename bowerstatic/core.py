@@ -81,12 +81,14 @@ class ComponentCollection(object):
     def get_resource(self, path):
         return self._resources.get(path)
 
-    def path_to_resource(self, path_or_resource):
+    def path_to_resources(self, path_or_resource):
         if isinstance(path_or_resource, basestring):
-            return self.resource(path_or_resource, [])
+            resource = self.resource(path_or_resource, [])
         else:
             resource = path_or_resource
-        return resource
+        if resource is None:
+            return None
+        return [resource]
 
     def get_component(self, component_name):
         return self._components.get(component_name)
@@ -125,11 +127,11 @@ class LocalComponentCollection(object):
             return result
         return self.component_collection.get_resource(path)
 
-    def path_to_resource(self, path_or_resource):
-        result = self.local_collection.path_to_resource(path_or_resource)
+    def path_to_resources(self, path_or_resource):
+        result = self.local_collection.path_to_resources(path_or_resource)
         if result is not None:
             return result
-        return self.component_collection.path_to_resource(path_or_resource)
+        return self.component_collection.path_to_resources(path_or_resource)
 
     def get_component(self, component_name):
         result = self.local_collection.get_component(component_name)
@@ -222,9 +224,6 @@ class Component(object):
 
 
 def create_resource(bower, component_collection, path, dependencies):
-    dependencies = [
-        component_collection.path_to_resource(dependency) for
-        dependency in dependencies]
     parts = path.split('/', 1)
     if len(parts) == 2:
         component_name, file_path = parts
@@ -240,8 +239,12 @@ def create_resource(bower, component_collection, path, dependencies):
     if not os.path.exists(fullpath):
         raise Error("resource path %s - cannot find resource file: %s" %
                     (path, fullpath))
+    dependency_resources = []
+    for dependency in dependencies:
+        dependency_resources.extend(
+            component_collection.path_to_resources(dependency))
     return Resource(bower, component_collection,
-                    component, file_path, dependencies)
+                    component, file_path, dependency_resources)
 
 
 class Resource(object):
