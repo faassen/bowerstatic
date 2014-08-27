@@ -66,11 +66,11 @@ class ComponentCollection(object):
         return Includer(self.bower, self, environ)
 
     def resource(self, path, dependencies=None, component_collection=None):
-        dependencies = dependencies or []
         resource = self._resources.get(path)
         if resource is not None:
             return resource
         component_collection = component_collection or self
+        dependencies = dependencies or []
         result = create_resource(self.bower, component_collection,
                                  path, dependencies)
         if result is None:
