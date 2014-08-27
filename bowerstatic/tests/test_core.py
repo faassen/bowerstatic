@@ -37,4 +37,4 @@ def test_component_url():
         os.path.dirname(__file__), 'bower_components'))
 
     assert (components.component('jquery').url() ==
-            '/bowerstatic/components/jquery/2.1.1')
+            '/bowerstatic/components/jquery/2.1.1/')

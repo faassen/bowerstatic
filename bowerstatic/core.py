@@ -284,7 +284,7 @@ class UrlComponent(object):
             self.component.name,
             self.component.version,
         ]
-        return '/' + '/'.join(parts)
+        return '/' + '/'.join(parts) + '/'
 
 
 class Resource(object):
@@ -297,4 +297,4 @@ class Resource(object):
         dummy, self.ext = os.path.splitext(file_path)
 
     def url(self):
-        return self.component.url() + '/' + self.file_path
+        return self.component.url() + self.file_path
