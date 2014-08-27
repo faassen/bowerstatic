@@ -4,4 +4,6 @@ parts
 develop-eggs
 .tern-port
 doc/_build
+.tox
+
 
