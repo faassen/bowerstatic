@@ -116,3 +116,15 @@ You can also refer to this resource in another resource definition::
 Dealing with explicit resource objects can be handy as it saves
 typing, and Python gives you an error if you refer to a resource
 object that does not exist, so you can catch typos early.
+
+Component objects
+-----------------
+
+It is sometimes useful to be able to generate the URL for a component
+itself, for instance when client-side code needs to construct URLs to
+things inside it, such as templates. To support this case,
+you can get the URL of a component by writing this::
+
+  components.component('jquery').url()
+
+This will generate the appropriate versioned URL to that component.
