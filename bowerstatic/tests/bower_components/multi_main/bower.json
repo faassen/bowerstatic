@@ -1,5 +1,5 @@
 {
-  "name": "jquery",
+  "name": "multi_main",
   "version": "2.1.1",
   "main": ["dist/jquery.js", "dist/another.js"]
 }

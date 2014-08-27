@@ -225,7 +225,6 @@ def test_injector_endpoint_main_missing():
         b'<html><head></head><body>Hello!</body></html>')
 
 
-@pytest.mark.xfail
 def test_injector_endpoint_multiple_mains():
     bower = bowerstatic.Bower()
 
@@ -245,7 +244,13 @@ def test_injector_endpoint_multiple_mains():
     response = c.get('/')
 
     assert response.body == (
-        b'<html><head></head><body>Hello!</body></html>')
+        b'<html><head>'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/multi_main/2.1.1/dist/jquery.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/multi_main/2.1.1/dist/another.js">'
+        b'</script></head><body>Hello!</body></html>')
 
 
 def test_injector_endpoint_resource():
