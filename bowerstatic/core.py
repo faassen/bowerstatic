@@ -55,43 +55,44 @@ class ComponentCollection(object):
         self._components = components
         self._resources = {}
         for component in components.values():
-            component.create_main_resource(self)
+            component.create_main_resources(self)
 
     def add(self, component, component_collection=None):
         self._components[component.name] = component
         component_collection = component_collection or self
-        component.create_main_resource(component_collection)
+        component.create_main_resources(component_collection)
 
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
-    def resource(self, path, dependencies=None, component_collection=None):
-        resource = self._resources.get(path)
-        if resource is not None:
-            return resource
+    def resources(self, path, dependencies=None, component_collection=None):
+        resources = self._resources.get(path)
+        if resources is not None:
+            return resources
         component_collection = component_collection or self
         dependencies = dependencies or []
         result = create_resources(self.bower, component_collection,
                                   path, dependencies)
         if result is None:
             return None
-        if not result:
-            return None
-        result = result[0]
         self._resources[path] = result
         return result
 
-    def get_resource(self, path):
+    resource = resources
+
+    def get_resources(self, path):
         return self._resources.get(path)
 
     def path_to_resources(self, path_or_resource):
         if isinstance(path_or_resource, basestring):
-            resource = self.resource(path_or_resource, [])
+            resources = self.resources(path_or_resource, [])
+        elif isinstance(path_or_resource, list):
+            resources = path_or_resource
         else:
-            resource = path_or_resource
-        if resource is None:
+            resources = [path_or_resource]
+        if resources is None:
             return None
-        return [resource]
+        return resources
 
     def get_component(self, component_name):
         return self._components.get(component_name)
@@ -113,22 +114,24 @@ class LocalComponentCollection(object):
     def includer(self, environ):
         return Includer(self.bower, self, environ)
 
-    def resource(self, path, dependencies=None):
+    def resources(self, path, dependencies=None):
         dependencies = dependencies or []
-        result = self.local_collection.resource(path, dependencies, self)
+        result = self.local_collection.resources(path, dependencies, self)
         if result is not None:
             return result
-        return self.component_collection.resource(path, dependencies)
+        return self.component_collection.resources(path, dependencies)
+
+    resource = resources
 
     def component(self, path, version):
         self.local_collection.add(
             load_component(path, 'bower.json', version, version is None), self)
 
-    def get_resource(self, path):
-        result = self.local_collection.get_resource(path)
+    def get_resources(self, path):
+        result = self.local_collection.get_resources(path)
         if result is not None:
             return result
-        return self.component_collection.get_resource(path)
+        return self.component_collection.get_resources(path)
 
     def path_to_resources(self, path_or_resource):
         result = self.local_collection.path_to_resources(path_or_resource)
@@ -201,20 +204,20 @@ class Component(object):
             return self._version
         return autoversion(self.path)
 
-    def create_main_resource(self, component_collection):
+    def create_main_resources(self, component_collection):
         # if the resource was already created, return it
-        resource = component_collection.get_resource(self.name)
-        if resource is not None:
-            return resource
+        resources = component_collection.get_resources(self.name)
+        if resources is not None:
+            return resources
         # create a main resource for all dependencies
         dependencies = []
         for component_name in self.dependencies.keys():
             component = component_collection.get_component(component_name)
-            dependencies.append(
-                component.create_main_resource(component_collection))
-        # depend on those main resources in this resource
-        return component_collection.resource(
-            self.name, dependencies=dependencies)
+            dependencies.extend(
+                component.create_main_resources(component_collection))
+        # depend on those main resources in these resources
+        return component_collection.resources(self.name,
+                                              dependencies=dependencies)
 
     def get_filename(self, version, file_path):
         if version != self.version:
