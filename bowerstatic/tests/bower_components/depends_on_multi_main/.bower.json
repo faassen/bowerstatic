@@ -1,0 +1,8 @@
+{
+  "name": "depends_on_multi_main",
+  "version": "2.1.1",
+  "main": ["dist/resource.js"],
+  "dependencies": {
+    "multi_main": ">=2.1.1"
+  }
+}

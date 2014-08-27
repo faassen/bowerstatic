@@ -1,0 +1,8 @@
+{
+  "name": "depends_on_missing_main",
+  "version": "2.1.1"
+  "main": "resource.js",
+  "dependencies": {
+    "missing_main": ">=2.1.1"
+  }
+}

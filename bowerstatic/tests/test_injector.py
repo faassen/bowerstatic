@@ -225,6 +225,31 @@ def test_injector_endpoint_main_missing():
         b'<html><head></head><body>Hello!</body></html>')
 
 
+def test_injector_endpoint_depends_on_main_missing():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('depends_on_missing_main')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    # without a main, it should just include nothing
+    assert response.body == (
+        b'<html><head><script type="text/javascript" '
+        b'src="/bowerstatic/components/depends_on_missing_main/'
+        b'2.1.1/resource.js"></script></head><body>Hello!</body></html>')
+
+
 def test_injector_endpoint_multiple_mains():
     bower = bowerstatic.Bower()
 
@@ -251,6 +276,38 @@ def test_injector_endpoint_multiple_mains():
         b'<script type="text/javascript" '
         b'src="/bowerstatic/components/multi_main/2.1.1/dist/another.js">'
         b'</script></head><body>Hello!</body></html>')
+
+
+def test_injector_endpoint_depends_on_multiple_mains():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('depends_on_multi_main')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    assert response.body == (
+        b'<html><head>'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/multi_main/2.1.1/dist/jquery.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/multi_main/2.1.1/dist/another.js">'
+        b'</script>\n'
+        b'<script type="text/javascript" '
+        b'src="/bowerstatic/components/depends_on_multi_main/'
+        b'2.1.1/dist/resource.js"></script>'
+        b'</head><body>Hello!</body></html>')
 
 
 def test_injector_endpoint_resource():
