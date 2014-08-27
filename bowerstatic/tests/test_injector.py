@@ -202,6 +202,54 @@ def test_injector_endpoint_path():
         b'</script></head><body>Hello!</body></html>')
 
 
+
+@pytest.mark.xfail
+def test_injector_endpoint_main_missing():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('missing_main')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    # without a main, it should just include nothing
+    assert response.body == (
+        b'<html><head></head><body>Hello!</body></html>')
+
+
+@pytest.mark.xfail
+def test_injector_endpoint_multiple_mains():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('multi_main')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    assert response.body == (
+        b'<html><head></head><body>Hello!</body></html>')
+
+
 def test_injector_endpoint_resource():
     bower = bowerstatic.Bower()
 

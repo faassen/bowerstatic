@@ -153,6 +153,8 @@ def load_components(path):
         if not os.path.isdir(fullpath):
             continue
         component = load_component(fullpath, '.bower.json')
+        if component is None:
+            continue
         result[component.name] = component
     return result
 
@@ -161,7 +163,9 @@ def load_component(path, bower_filename, version=None, autoversion=False):
     bower_json_filename = os.path.join(path, bower_filename)
     with open(bower_json_filename, 'rb') as f:
         data = json.load(f)
-    if isinstance(data['main'], list):
+    if 'main' not in data:
+        return None
+    elif isinstance(data['main'], list):
         main = data['main'][0]
     else:
         main = data['main']
