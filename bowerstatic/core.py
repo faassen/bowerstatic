@@ -71,10 +71,13 @@ class ComponentCollection(object):
             return resource
         component_collection = component_collection or self
         dependencies = dependencies or []
-        result = create_resource(self.bower, component_collection,
-                                 path, dependencies)
+        result = create_resources(self.bower, component_collection,
+                                  path, dependencies)
         if result is None:
             return None
+        if not result:
+            return None
+        result = result[0]
         self._resources[path] = result
         return result
 
@@ -245,20 +248,18 @@ def get_component_and_filepaths(component_collection, path):
     return component, file_paths
 
 
-def create_resource(bower, component_collection, path, dependencies):
+def create_resources(bower, component_collection, path, dependencies):
     info = get_component_and_filepaths(component_collection, path)
     if info is None:
         return None
     component, file_paths = info
-    if not file_paths:
-        return None
-    file_path = file_paths[0]
     dependency_resources = []
     for dependency in dependencies:
         dependency_resources.extend(
             component_collection.path_to_resources(dependency))
-    return Resource(bower, component_collection,
-                    component, file_path, dependency_resources)
+    return [Resource(bower, component_collection, component,
+                     file_path, dependency_resources) for file_path
+            in file_paths]
 
 
 class Resource(object):
