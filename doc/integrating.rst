@@ -103,6 +103,16 @@ Using the ``components`` object we created earlier for a
 
   include = components.includer(environ)
 
+You need to create the ``include`` function within your WSGI
+application, typically just before you want to use it. You need to
+pass in the WSGI ``environ`` object, as this is where the inclusions
+are stored. You can create the ``include`` function as many times as
+you like for a WSGI environ; the inclusions are shared.
+
+Now that we have ``include``, we can use it to include resources::
+
+  include('jquery/dist/jquery.js')
+
 .. sidebar:: WSGI environ
 
   BowerStatic's includer system needs to interact with the WSGI
@@ -114,16 +124,6 @@ Using the ``components`` object we created earlier for a
   BowerStatic; in that case the integration can offer the ``include``
   function directly and takes care of interacting with the ``environ``
   for you.
-
-You need to create the ``include`` function within your WSGI
-application, typically just before you want to use it. You need to
-pass in the WSGI ``environ`` object, as this is where the inclusions
-are stored. You can create the ``include`` function as many times as
-you like for a WSGI environ; the inclusions are shared.
-
-Now that we have ``include``, we can use it to include resources::
-
-  include('jquery/dist/jquery.js')
 
 This specifies you want to include the ``dist/jquery.js`` resource
 from within the installed ``jquery`` component. This refers to an
@@ -139,6 +139,25 @@ HTML page automatically::
     type="text/javascript"
     src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">
   </script>
+
+Supporting additional types of resources
+----------------------------------------
+
+There are all kinds of resource types out there on the web, and
+BowerStatic does not know how to include all of them on a HTML
+page. You can tell the bower object how to handle a new resource type
+like this::
+
+   def render_foo(url):
+       return "<foo>%s</foo>" % url
+
+   bower.renderer('.foo', render_foo)
+
+If you now include a resource like ``example.foo``, that resource gets
+included on the web page as ```<foo>/path/to/example.foo</foo>```.
+
+You can also use ``renderer()`` to override existing behavior of how a
+resource with a particular extension is to be included.
 
 URL structure
 -------------

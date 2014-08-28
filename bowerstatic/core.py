@@ -5,6 +5,7 @@ from .injector import Injector
 from .includer import Includer
 from .autoversion import autoversion
 from .error import Error
+from .renderer import Renderer
 
 
 class Bower(object):
@@ -13,6 +14,7 @@ class Bower(object):
     def __init__(self, publisher_signature='bowerstatic'):
         self.publisher_signature = publisher_signature
         self._component_collections = {}
+        self._renderer = Renderer()
 
     def components(self, name, path):
         if name in self._component_collections:
@@ -36,6 +38,12 @@ class Bower(object):
 
     def injector(self, wsgi):
         return Injector(self, wsgi)
+
+    def renderer(self, ext, render_func):
+        self._renderer.register(ext, render_func)
+
+    def html(self, resource):
+        return self._renderer.html(resource)
 
     def get_filename(self, bower_components_name,
                      component_name, component_version, file_path):
@@ -286,6 +294,9 @@ class UrlComponent(object):
         ]
         return '/' + '/'.join(parts) + '/'
 
+    def html(self, resource):
+        return self.bower.html(resource)
+
 
 class Resource(object):
     def __init__(self, component, file_path, dependencies):
@@ -298,3 +309,6 @@ class Resource(object):
 
     def url(self):
         return self.component.url() + self.file_path
+
+    def html(self):
+        return self.component.html(self)

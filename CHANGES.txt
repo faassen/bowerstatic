@@ -20,6 +20,11 @@ CHANGES
   directory, which is sometimes useful when client-side code needs to
   construct URLs itself, such as for templates. Fixes issue #8.
 
+- You can register a renderer for a particular extension type using,
+  for example, ``bower.renderer('.js', render_js)``, where
+  ``render_js`` takes a URL and should return a string with a HTML
+  snippet to include on the page.
+
 0.2 (2014-07-18)
 ================
 

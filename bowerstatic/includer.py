@@ -67,10 +67,4 @@ class ResourceInclusion(Inclusion):
                 for resource in self.resource.dependencies]
 
     def html(self):
-        url = self.resource.url()
-        # XXX should this be based on mimetype instead?
-        if self.resource.ext == '.js':
-            return '<script type="text/javascript" src="%s"></script>' % url
-        elif self.resource.ext == '.css':
-            return '<link rel="stylesheet" type="text/css" href="%s" />' % url
-        assert False, "Unknown extension for url:" % url
+        return self.resource.html()

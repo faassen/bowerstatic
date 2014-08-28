@@ -602,3 +602,51 @@ def test_injector_PUT_no_effect():
 
     response = c.put('/')
     assert response.body == b'<html><head></head><body>Hello!</body></html>'
+
+
+def test_custom_renderer():
+    bower = bowerstatic.Bower()
+
+    def render_foo(url):
+        return '<foo>%s</foo>' % url
+
+    bower.renderer('.foo', render_foo)
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery/dist/resource.foo')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head><foo>/bowerstatic/components/jquery/2.1.1/dist/'
+        b'resource.foo</foo>'
+        b'</head><body>Hello!</body></html>')
+
+
+def test_missing_renderer():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery/dist/resource.foo')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    with pytest.raises(bowerstatic.Error):
+        c.get('/')
