@@ -159,6 +159,9 @@ included on the web page as ```<foo>/path/to/example.foo</foo>```.
 You can also use ``renderer()`` to override existing behavior of how a
 resource with a particular extension is to be included.
 
+If you include a resource with an unrecognized extension, a
+``bowerstatic.Error`` is raised.
+
 URL structure
 -------------
 
@@ -261,6 +264,9 @@ inclusions in your HTML::
     type="text/javascript"
     src="/bowerstatic/static/jquery-ui/1.10.4/ui/jquery-ui.js">
   </script>
+
+If ``main`` lists a resource with an extension that has no renderer
+registered for it, that resource is not included.
 
 WSGI Publisher and Injector
 ---------------------------

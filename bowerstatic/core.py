@@ -45,6 +45,9 @@ class Bower(object):
     def html(self, resource):
         return self._renderer.html(resource)
 
+    def filter_by_known_ext(self, paths):
+        return self._renderer.filter_by_known_ext(paths)
+
     def get_filename(self, bower_components_name,
                      component_name, component_version, file_path):
         component_collection = self._component_collections.get(
@@ -254,7 +257,8 @@ def get_component_and_filepaths(component_collection, path):
     if component is None:
         return None
     if file_path is None:
-        file_paths = component.main
+        file_paths = component_collection.bower.filter_by_known_ext(
+            component.main)
     else:
         file_paths = [file_path]
     for file_path in file_paths:

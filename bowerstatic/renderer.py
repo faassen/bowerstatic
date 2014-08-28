@@ -1,3 +1,4 @@
+import os
 from .error import Error
 
 
@@ -9,6 +10,15 @@ class Renderer(object):
 
     def register(self, ext, renderer):
         self._renderers[ext] = renderer
+
+    def filter_by_known_ext(self, paths):
+        result = []
+        for path in paths:
+            _, ext = os.path.splitext(path)
+            if ext not in self._renderers:
+                continue
+            result.append(path)
+        return result
 
     def html(self, resource):
         url = resource.url()

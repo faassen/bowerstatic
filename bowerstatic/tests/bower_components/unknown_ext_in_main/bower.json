@@ -1,0 +1,5 @@
+{
+  "name": "unknown_ext_in_main",
+  "version": "2.1.1",
+  "main": ["dist/jquery.js", "dist/another.foo"]
+}

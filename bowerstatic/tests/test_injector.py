@@ -650,3 +650,27 @@ def test_missing_renderer():
 
     with pytest.raises(bowerstatic.Error):
         c.get('/')
+
+
+def test_injector_main_unknown_extension():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('unknown_ext_in_main')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+
+    assert response.body == (
+        b'<html><head><script type="text/javascript" '
+        b'src="/bowerstatic/components/unknown_ext_in_main/2.1.1/'
+        b'dist/jquery.js"></script></head><body>Hello!</body></html>')
