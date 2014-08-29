@@ -312,4 +312,50 @@ is equivalent to this::
 
   app = bower.publisher(bower.injector(my_wsgi_app))
 
+Example Flask integration
+-------------------------
+Currently there is no Flask extension for BowerStatic integration, but 
+manual integration is not too hard. The following code is sufficient to get it working::
 
+    from flask import Flask, render_template, request
+    import bowerstatic
+    import os.path
+    
+    app = Flask(__name__)
+    bower = bowerstatic.Bower()
+    components = bower.components('components', os.path.join(os.path.dirname(__file__), 'static/bower_components'))
+    
+    
+    @app.before_request
+    def include_js_css():
+        include = components.includer(request.environ)
+        include('jquery/dist/jquery.min.js')
+        include('bootstrap/dist/js/bootstrap.min.js')
+        include('bootstrap/dist/css/bootstrap.min.css')
+
+        # these do not work yet:
+        # include('dist/fonts/glyphicons-halflings-regular.eot')
+        # include('dist/fonts/glyphicons-halflings-regular.ttf')
+        # include('bootstrap/less/bootstrap.less')
+
+
+    @app.route('/')
+    def home():
+        return render_template('home.html')
+    
+    
+    @app.route('/welcome')
+    def welcome():
+        return render_template('welcome.html')
+    
+    
+    if __name__ == "__main__":
+        app.wsgi_app = bower.wrap(app.wsgi_app)   # please note the wrapping of the wsgi app not the Flask app.
+        app.run(debug=True)
+
+
+Due to the wsgi magic no changes to the Jinja templates are necessary.
+
+Please note that BowerStatic does not support file extensions other than css and js. So, for example, font 
+files will generate errors. Therefore file inclusion by using the Bower main endpoint might not work for 
+some packages (like Bootstrap).
