@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.4 (unreleased)
+0.4 (2014-09-08)
 ================
 
 - There was a bug in the new ``component(name)`` method to obtain the
