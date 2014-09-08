@@ -4,8 +4,25 @@ CHANGES
 0.4 (unreleased)
 ================
 
-- Nothing changed yet.
+- There was a bug in the new ``component(name)`` method to obtain the
+  component, because it wouldn't work for local components. Fixing this
+  properly took a significant refactoring:
 
+  * the ComponentCollection gains its own fallback behavior, much
+    simpler to implement than in LocalComponentCollection.
+
+  * UrlComponent is now gone and Component gains that functionality; it
+    keeps a reference to the collection itself now.
+
+  * add a lot of free-standing functions to the methods.
+
+  * an earlier hack passing the component collection through an argument
+    is now gone.
+
+- The new ``.component()`` API to get a component from a collection
+  explicitly in order to get its URL is gone again as it conflicted
+  with an earlier API on local component collections. Instead use
+  ``collection.get_component(name)``.
 
 0.3 (2014-08-28)
 ================

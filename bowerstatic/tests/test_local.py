@@ -139,7 +139,7 @@ def test_local_internal_dependencies():
         b'</head><body>Hello!</body></html>')
 
 
-def test_local__external_dependencies():
+def test_local_external_dependencies():
     bower = bowerstatic.Bower()
 
     components = bower.components('components', os.path.join(
@@ -190,13 +190,10 @@ def test_local_bower_json_dependencies():
 
     local.component(path, version='2.0')
 
-    local.resource('local_component/local.js', dependencies=[
-        'jquery'])
-
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
-        include('local_component/local.js')
+        include('local_component')
         return ['<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)

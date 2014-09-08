@@ -36,5 +36,18 @@ def test_component_url():
     components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
 
-    assert (components.component('jquery').url() ==
+    assert (components.get_component('jquery').url() ==
+            '/bowerstatic/components/jquery/2.1.1/')
+
+
+
+def test_component_url_local():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    local = bower.local_components('local', components)
+
+    assert (local.get_component('jquery').url() ==
             '/bowerstatic/components/jquery/2.1.1/')

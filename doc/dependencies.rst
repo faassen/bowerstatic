@@ -125,6 +125,6 @@ itself, for instance when client-side code needs to construct URLs to
 things inside it, such as templates. To support this case,
 you can get the URL of a component by writing this::
 
-  components.component('jquery').url()
+  components.get_component('jquery').url()
 
 This will generate the appropriate versioned URL to that component.
