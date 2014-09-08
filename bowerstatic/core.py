@@ -195,8 +195,9 @@ class ComponentCollection(object):
         for file_path in file_paths:
             full_path = os.path.join(component.path, file_path)
             if not os.path.exists(full_path):
-                raise Error("resource path %s - cannot find resource file: %s" %
-                            (path, full_path))
+                raise Error(
+                    "resource path %s - cannot find resource file: %s" %
+                    (path, full_path))
         return component, file_paths
 
     def create_resources(self, path, dependencies):

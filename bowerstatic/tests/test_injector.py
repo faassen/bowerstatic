@@ -151,7 +151,6 @@ def test_injector_wrong_component_then_added(tmpdir):
         b'</script></head><body>Hello!</body></html>')
 
 
-
 def test_injector_specific_resource():
     bower = bowerstatic.Bower()
 

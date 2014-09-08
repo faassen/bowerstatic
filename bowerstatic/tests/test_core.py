@@ -40,7 +40,6 @@ def test_component_url():
             '/bowerstatic/components/jquery/2.1.1/')
 
 
-
 def test_component_url_local():
     bower = bowerstatic.Bower()
 
