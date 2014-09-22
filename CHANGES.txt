@@ -17,6 +17,9 @@ CHANGES
 
   This fixes bug #20. (Thanks to Michael Howitz for the bug report)
 
+- Display a nicer error messages when a component depends on another one
+  that doesn't exist. Thanks for Michael Howitz for the improvement.
+
 0.4 (2014-09-08)
 ================
 
