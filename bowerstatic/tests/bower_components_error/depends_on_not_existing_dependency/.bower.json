@@ -1,0 +1,7 @@
+{
+  "name": "depending",
+  "version": "1.0",
+  "dependencies": {
+    "i-do-not-exist": "*"
+  }
+}
