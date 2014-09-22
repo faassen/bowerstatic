@@ -1,6 +1,7 @@
-import bowerstatic
 from webtest import TestApp as Client
+import bowerstatic
 import os
+import pytest
 
 
 def test_wrap():
@@ -50,3 +51,12 @@ def test_component_url_local():
 
     assert (local.get_component('jquery').url() ==
             '/bowerstatic/components/jquery/2.1.1/')
+
+
+def test_nice_error_message_when_depending_on_not_existing_dependency():
+    bower = bowerstatic.Bower()
+
+    with pytest.raises(bowerstatic.error.Error) as excinfo:
+        bower.components('components', os.path.join(
+            os.path.dirname(__file__), 'bower_components_error'))
+    assert "Component u'i-do-not-exist' missing." == str(excinfo.value)

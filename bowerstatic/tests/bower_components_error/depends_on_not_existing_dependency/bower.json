@@ -1,0 +1,6 @@
+{
+  "name": "depending",
+  "dependencies": {
+    "i-do-not-exist": "*"
+  }
+}
