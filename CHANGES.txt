@@ -4,8 +4,18 @@ CHANGES
 0.5 (unreleased)
 ================
 
-- Nothing changed yet.
+- On some platforms and filesystems (such as Linux ext3, Mac OS X)
+  ``os.path.getmtime()`` returns timestamps with the granularity of
+  seconds instead of subseconds such as Linux ext4. We go for second
+  granularity now by default for autoversioning as this should be good
+  enough during development.
 
+  The test for autoversioning was assuming sub-second granularity and
+  this test failed. This test is now skipped on Mac OS X. What didn't
+  help was weird code in BowerStatic that cut off the last bit of the
+  microsecond isoformat -- this was removed.
+
+  This fixes bug #20. (Thanks to Michael Howitz for the bug report)
 
 0.4 (2014-09-08)
 ================

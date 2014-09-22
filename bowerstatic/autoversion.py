@@ -23,7 +23,7 @@ def list_directory(path, ignore_directories, ignore_extensions):
             yield os.path.join(root, file)
 
 
-def autoversion(path):
+def get_latest_filesystem_datetime(path):
     latest = 0
     for path in list_directory(
             path,
@@ -31,4 +31,28 @@ def autoversion(path):
             ignore_extensions=IGNORE_EXTENSIONS):
         mtime = os.path.getmtime(path)
         latest = max(mtime, latest)
-    return datetime.fromtimestamp(latest).isoformat()[:-1]
+    return datetime.fromtimestamp(latest)
+
+
+def filesystem_microsecond_autoversion(path):
+    """Filesystem latest change, microsecond granularity.
+
+    On Linux this will include microsecond information in the generated
+    versioning URLs.
+
+    On some filesystems, such as MacOS X, there is no microsecond information,
+    so that this behaves like filesystem_second_autoversion.
+    """
+    return get_latest_filesystem_datetime(path).isoformat()
+
+
+def filesystem_second_autoversion(path):
+    """Filesystem latest change, second granularity.
+
+    Some filesystems such as MacOS X don't return microsecond timestamps.
+    To make the autoversioning scheme behave consistently across platforms,
+    rip off the microsecond information.
+    """
+    result = get_latest_filesystem_datetime(path)
+    result = result.replace(microsecond=0)
+    return result.isoformat()

@@ -3,7 +3,7 @@ import json
 from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
-from .autoversion import autoversion
+from .autoversion import filesystem_second_autoversion
 from .error import Error
 from .renderer import Renderer
 
@@ -11,10 +11,11 @@ from .renderer import Renderer
 class Bower(object):
     """Contains a bunch of bower_components directories.
     """
-    def __init__(self, publisher_signature='bowerstatic'):
+    def __init__(self, publisher_signature='bowerstatic', autoversion=None):
         self.publisher_signature = publisher_signature
         self._component_collections = {}
         self._renderer = Renderer()
+        self.autoversion = autoversion or filesystem_second_autoversion
 
     def components(self, name, path):
         if name in self._component_collections:
@@ -228,7 +229,7 @@ class Component(object):
     def version(self):
         if not self.autoversion:
             return self._version
-        return autoversion(self.path)
+        return self.bower.autoversion(self.path)
 
     def get_filename(self, version, file_path):
         if version != self.version:
