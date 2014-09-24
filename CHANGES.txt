@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.5 (unreleased)
+0.5 (2014-09-24)
 ================
 
 - On some platforms and filesystems (such as Linux ext3, Mac OS X)
