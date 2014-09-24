@@ -1,4 +1,4 @@
-from toposort import topological_sort
+from .toposort import topological_sort
 from .error import Error
 
 

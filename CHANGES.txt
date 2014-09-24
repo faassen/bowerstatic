@@ -20,6 +20,10 @@ CHANGES
 - Display a nicer error messages when a component depends on another one
   that doesn't exist. Thanks for Michael Howitz for the improvement.
 
+- Internal toposort module was not imported relative to package,
+  which could lead to errors in some circumstances. Thanks TylorS for
+  reporting! Fixes issue #24.
+
 0.4 (2014-09-08)
 ================
 
