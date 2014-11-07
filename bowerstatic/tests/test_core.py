@@ -14,7 +14,7 @@ def test_wrap():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -59,4 +59,8 @@ def test_nice_error_message_when_depending_on_not_existing_dependency():
     with pytest.raises(bowerstatic.error.Error) as excinfo:
         bower.components('components', os.path.join(
             os.path.dirname(__file__), 'bower_components_error'))
-    assert "Component u'i-do-not-exist' missing." == str(excinfo.value)
+
+    if bowerstatic.compat.PY3:
+        assert "Component 'i-do-not-exist' missing." == str(excinfo.value)
+    else:
+        assert "Component u'i-do-not-exist' missing." == str(excinfo.value)

@@ -15,7 +15,7 @@ def c():
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
-        return ['Hello!']
+        return [b'Hello!']
 
     publisher = bower.publisher(wsgi)
 
@@ -87,7 +87,7 @@ def test_different_publisher_signature():
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
-        return ['Hello!']
+        return [b'Hello!']
 
     publisher = bower.publisher(wsgi)
 

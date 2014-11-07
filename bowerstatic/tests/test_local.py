@@ -6,6 +6,7 @@ import json
 from datetime import datetime, timedelta
 import pytest
 
+from bowerstatic import compat
 from bowerstatic import filesystem_microsecond_autoversion
 
 
@@ -21,7 +22,7 @@ def test_local_falls_back_to_components():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -55,7 +56,7 @@ def test_local_with_local_component_main():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('local_component')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -89,7 +90,7 @@ def test_local_with_local_component_specific_file():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('local_component/local.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -126,7 +127,7 @@ def test_local_internal_dependencies():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('local_component/second.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -163,7 +164,7 @@ def test_local_external_dependencies():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('local_component/local.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -198,7 +199,7 @@ def test_local_bower_json_dependencies():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('local_component')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -252,7 +253,7 @@ def test_local_with_microsecond_auto_version(tmpdir):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('component/main.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -262,7 +263,7 @@ def test_local_with_microsecond_auto_version(tmpdir):
     before_dt = datetime.now()
 
     def get_url_dt(response):
-        s = unicode(response.body, 'UTF-8')
+        s = compat.text_type(response.body, 'UTF-8')
         start = s.find('src="') + len('src="')
         end = s.find('"', start)
         url = s[start:end]
@@ -333,7 +334,7 @@ def test_local_with_second_auto_version(tmpdir):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = local.includer(environ)
         include('component/main.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     wrapped = bower.wrap(wsgi)
 
@@ -343,7 +344,7 @@ def test_local_with_second_auto_version(tmpdir):
     before_dt = datetime.now()
 
     def get_url_dt(response):
-        s = unicode(response.body, 'UTF-8')
+        s = compat.text_type(response.body, 'UTF-8')
         start = s.find('src="') + len('src="')
         end = s.find('"', start)
         url = s[start:end]
