@@ -1,4 +1,5 @@
 import os
+import inspect
 import json
 from .publisher import Publisher
 from .injector import Injector
@@ -18,6 +19,11 @@ class Bower(object):
         self.autoversion = autoversion or filesystem_second_autoversion
 
     def components(self, name, path):
+        if not os.path.isabs(path):
+            calling_file = inspect.stack()[1][1]
+            calling_dir = os.path.split(calling_file)[0]
+            path = os.path.join(calling_dir, path)
+
         if name in self._component_collections:
             raise Error("Duplicate name for components directory: %s" % name)
         result = ComponentCollection(self, name, path=path)
@@ -81,8 +87,16 @@ class ComponentCollection(object):
 
     def component(self, path, version):
         assert self.fallback_collection is not None
-        self.add(self.load_component(
-            path, 'bower.json', version, version is None))
+
+        if not os.path.isabs(path):
+            calling_file = inspect.stack()[1][1]
+            calling_dir = os.path.split(calling_file)[0]
+            path = os.path.join(calling_dir, path)
+
+        component = self.load_component(
+            path, 'bower.json', version, version is None)
+        self.add(component)
+        return component
 
     def load_components(self, path):
         result = {}

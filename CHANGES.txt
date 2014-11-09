@@ -4,7 +4,9 @@ CHANGES
 0.6 (unreleased)
 ================
 
-- Nothing changed yet.
+- Bower Components and Local Components can be created based on a path relative to
+  the directory in which the components are created. This means that bower_components
+  can be part of the package.
 
 
 0.5 (2014-09-24)
