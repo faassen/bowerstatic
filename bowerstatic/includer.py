@@ -8,14 +8,14 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, path_or_resources):
+    def __call__(self, path_or_resources, custom_html=None):
         resources = self.components_directory.path_to_resources(
             path_or_resources)
         if resources is None:
             raise Error("Cannot find component for path (need restart?): %s" %
                         path_or_resources)
         for resource in resources:
-            self.add(ResourceInclusion(resource))
+            self.add(ResourceInclusion(resource, custom_html))
 
     def add(self, inclusion):
         inclusions = self.environ.setdefault(
@@ -46,8 +46,9 @@ class Inclusion(object):
 
 
 class ResourceInclusion(Inclusion):
-    def __init__(self, resource):
+    def __init__(self, resource, custom_html=None):
         self.resource = resource
+        self.custom_html = custom_html
 
     def __repr__(self):
         return ('<bowerstatic.includer.ResourceInclusion for %s>' %
@@ -67,4 +68,12 @@ class ResourceInclusion(Inclusion):
                 for resource in self.resource.dependencies]
 
     def html(self):
+        if self.custom_html is not None:
+            if isinstance(self.custom_html, basestring):
+                # format string
+                return self.custom_html.format(url=self.resource.url())
+            if callable(self.custom_html):
+                return self.custom_html(url=self.resource.url())
+            raise ValueError('unknown html renderer')
+
         return self.resource.html()

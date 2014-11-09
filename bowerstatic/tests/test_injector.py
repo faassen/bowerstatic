@@ -673,3 +673,49 @@ def test_injector_main_unknown_extension():
         b'<html><head><script type="text/javascript" '
         b'src="/bowerstatic/components/unknown_ext_in_main/2.1.1/'
         b'dist/jquery.js"></script></head><body>Hello!</body></html>')
+
+
+def test_injector_custom_html_format():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery', '<link src="{url}"/>')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<link src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js"/>'
+        b'</head><body>Hello!</body></html>')
+
+def test_injector_custom_html_callable():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery', lambda url: '<link src="' + url + '"/>')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<link src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js"/>'
+        b'</head><body>Hello!</body></html>')
+
