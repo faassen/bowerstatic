@@ -313,15 +313,24 @@ is equivalent to this::
   app = bower.publisher(bower.injector(my_wsgi_app))
 
 
-Using the Publisher and Injector without WSGI
----------------------------------------------
+Using the Publisher and Injector with WebOb
+-------------------------------------------
 
-The Injector/Publisher may be used without a WSGI instance. This is useful
-for integration into other web frameworks::
+The ``Injector`` and ``Publisher`` can also directly be used with
+WebOb_ request and response objects. This is useful for integration
+with web frameworks that already use WebOb, such as Morepath_ and
+Pyramid_::
 
     injector = bower.injector(wsgi=None)
     publisher = bower.publisher(wsgi=None)
 
     response = publisher.publish(request, injector.inject(request, response))
 
-All that is required is a request and a response.
+All that is required is a WebOb request and a response.
+
+.. _WebOb: http://webob.org
+
+.. _Morepath: http://morepath.readthedocs.org
+
+.. _Pyramid: http://www.pylonsproject.org/
+

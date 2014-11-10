@@ -7,7 +7,7 @@ CREDITS
 
 * Reinout van Rees (a few doc fixes)
 
-* Denis Krienbühl (Python 3 compatibility)
+* Denis Krienbühl (Python 3 compatibility, direct request/response API)
 
 * Special thanks to the Fanstatic developers.
 
