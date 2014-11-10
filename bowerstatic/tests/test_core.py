@@ -60,7 +60,4 @@ def test_nice_error_message_when_depending_on_not_existing_dependency():
         bower.components('components', os.path.join(
             os.path.dirname(__file__), 'bower_components_error'))
 
-    if bowerstatic.compat.PY3:
-        assert "Component 'i-do-not-exist' missing." == str(excinfo.value)
-    else:
-        assert "Component u'i-do-not-exist' missing." == str(excinfo.value)
+    assert "Component i-do-not-exist missing." == str(excinfo.value)

@@ -247,7 +247,7 @@ class Component(object):
             found_component = self.component_collection.get_component(
                 component_name)
             if found_component is None:
-                raise Error("Component %r missing." % component_name)
+                raise Error("Component %s missing." % component_name)
             result.extend(
                 found_component.component_collection.create_main_resources(
                     found_component))
