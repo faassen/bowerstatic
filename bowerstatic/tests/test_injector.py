@@ -15,7 +15,7 @@ def test_injector_specific_path():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -40,7 +40,7 @@ def test_injector_specific_path_wrong_file():
         include = components.includer(environ)
         with pytest.raises(bowerstatic.Error):
             include('jquery/nonexistent.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -69,7 +69,7 @@ def test_injector_specific_path_wrong_file_then_added(tmpdir):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('component/notyet.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -102,7 +102,7 @@ def test_injector_wrong_component():
         include = components.includer(environ)
         with pytest.raises(bowerstatic.Error):
             include('nonexistent/nonexistent.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -123,7 +123,7 @@ def test_injector_wrong_component_then_added(tmpdir):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('component/main.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -163,7 +163,7 @@ def test_injector_specific_resource():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include(jquery)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -187,7 +187,7 @@ def test_injector_endpoint_path():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -211,7 +211,7 @@ def test_injector_endpoint_main_missing():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('missing_main')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -234,7 +234,7 @@ def test_injector_endpoint_depends_on_main_missing():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('depends_on_missing_main')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -259,7 +259,7 @@ def test_injector_endpoint_multiple_mains():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('multi_main')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -287,7 +287,7 @@ def test_injector_endpoint_depends_on_multiple_mains():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('depends_on_multi_main')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -321,7 +321,7 @@ def test_injector_endpoint_resource():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include(jquery)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -345,7 +345,7 @@ def test_injector_endpoint_dependencies():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery-ui')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -376,7 +376,7 @@ def test_injector_endpoint_dependencies_with_explicit_resource_objects():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include(jquery_ui)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -409,7 +409,7 @@ def test_injector_normal_dependencies():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery-ui/ui/minified/jquery-ui.min.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -445,7 +445,7 @@ def test_injector_normal_dependencies_explicit_resource_objects():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include(jquery_ui_min)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -472,7 +472,7 @@ def test_injector_no_inclusions():
 
     def wsgi(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -493,7 +493,7 @@ def test_injector_multiple_identical_inclusions():
         include = components.includer(environ)
         include('jquery')
         include('jquery')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -520,7 +520,7 @@ def test_injector_multiple_identical_inclusions_through_dependencies():
         # going to pull in jquery-ui and jquery twice
         include('jquery-ui')
         include('jquery-ui-bootstrap')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -552,7 +552,7 @@ def test_injector_no_head_to_inject():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['<html><body>Hello!</body></html>']
+        return [b'<html><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -573,7 +573,7 @@ def test_injector_not_html_no_effect():
         start_response('200 OK', [('Content-Type', 'text/plain')])
         include = components.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['Hello!']
+        return [b'Hello!']
 
     injector = bower.injector(wsgi)
 
@@ -593,7 +593,7 @@ def test_injector_PUT_no_effect():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/jquery.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -618,7 +618,7 @@ def test_custom_renderer():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/resource.foo')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -641,7 +641,7 @@ def test_missing_renderer():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery/dist/resource.foo')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -661,7 +661,7 @@ def test_injector_main_unknown_extension():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('unknown_ext_in_main')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 

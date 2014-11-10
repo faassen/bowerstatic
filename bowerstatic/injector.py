@@ -23,7 +23,6 @@ class Injector(object):
         body = response.body
         response.body = b''
         body = body.replace(
-            '</head>',
-            '%s</head>' % inclusions.render())
+            b'</head>', b''.join((inclusions.render().encode(), b'</head>')))
         response.write(body)
         return response

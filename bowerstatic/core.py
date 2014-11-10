@@ -1,5 +1,6 @@
 import os
 import json
+from . import compat
 from .publisher import Publisher
 from .injector import Injector
 from .includer import Includer
@@ -99,7 +100,7 @@ class ComponentCollection(object):
     def load_component(self, path, bower_filename, version=None,
                        autoversion=False):
         bower_json_filename = os.path.join(path, bower_filename)
-        with open(bower_json_filename, 'rb') as f:
+        with open(bower_json_filename, 'r') as f:
             data = json.load(f)
         if 'main' not in data:
             main = []
@@ -155,7 +156,7 @@ class ComponentCollection(object):
         return self.fallback_collection.get_resources(path)
 
     def path_to_resources(self, path_or_resources):
-        if isinstance(path_or_resources, basestring):
+        if isinstance(path_or_resources, compat.string_types):
             resources = self.resources(path_or_resources, [])
         elif isinstance(path_or_resources, list):
             resources = path_or_resources

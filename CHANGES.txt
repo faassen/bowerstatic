@@ -4,8 +4,7 @@ CHANGES
 0.6 (unreleased)
 ================
 
-- Nothing changed yet.
-
+- Added Python 3 compatibility. Fixes issue #25.
 
 0.5 (2014-09-24)
 ================

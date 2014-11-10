@@ -7,6 +7,8 @@ CREDITS
 
 * Reinout van Rees (a few doc fixes)
 
+* Denis Krienbühl (Python 3 compatibility)
+
 * Special thanks to the Fanstatic developers.
 
 * Special thanks to CONTACT software.
