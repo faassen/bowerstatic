@@ -10,9 +10,7 @@ class Injector(object):
         self.bower = bower
         self.wsgi = wsgi
 
-    @webob.dec.wsgify
-    def __call__(self, request):
-        response = request.get_response(self.wsgi)
+    def inject(self, request, response):
         if request.method not in METHODS:
             return response
         if response.content_type.lower() not in CONTENT_TYPES:
@@ -26,3 +24,7 @@ class Injector(object):
             b'</head>', b''.join((inclusions.render().encode(), b'</head>')))
         response.write(body)
         return response
+
+    @webob.dec.wsgify
+    def __call__(self, request):
+        return self.inject(request, request.get_response(self.wsgi))

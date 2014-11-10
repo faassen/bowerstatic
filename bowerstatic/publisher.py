@@ -17,13 +17,12 @@ class Publisher(object):
         self.bower = bower
         self.wsgi = wsgi
 
-    @webob.dec.wsgify
-    def __call__(self, request):
+    def publish(self, request, response):
         # first segment should be publisher signature
         publisher_signature = request.path_info_peek()
         # pass through to underlying WSGI app
         if publisher_signature != self.bower.publisher_signature:
-            return request.get_response(self.wsgi)
+            return response
         request.path_info_pop()
         # next segment is BowerComponents name
         bower_components_name = request.path_info_pop()
@@ -54,3 +53,7 @@ class Publisher(object):
             response.expires = time.time() + FOREVER
         # XXX do we really want to rely on mimetype guessing?
         return response
+
+    @webob.dec.wsgify
+    def __call__(self, request):
+        return self.publish(request, request.get_response(self.wsgi))

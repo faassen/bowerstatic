@@ -313,3 +313,15 @@ is equivalent to this::
   app = bower.publisher(bower.injector(my_wsgi_app))
 
 
+Using the Publisher and Injector without WSGI
+---------------------------------------------
+
+The Injector/Publisher may be used without a WSGI instance. This is useful
+for integration into other web frameworks::
+
+    injector = bower.injector(wsgi=None)
+    publisher = bower.publisher(wsgi=None)
+
+    response = publisher.publish(request, injector.inject(request, response))
+
+All that is required is a request and a response.
