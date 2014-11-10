@@ -6,6 +6,10 @@ CHANGES
 
 - Added Python 3 compatibility. Fixes issue #25.
 
+- The injector and the publisher can now also be used by providing request and
+  response. This enables third-party frameworks to write integrations that 
+  don't require wrapping of the wsgi instance.
+
 0.5 (2014-09-24)
 ================
 
