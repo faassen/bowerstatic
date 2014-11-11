@@ -154,7 +154,7 @@ like this::
    bower.renderer('.foo', render_foo)
 
 If you now include a resource like ``example.foo``, that resource gets
-included on the web page as ```<foo>/path/to/example.foo</foo>```.
+included on the web page as ``<foo>/path/to/example.foo</foo>``.
 
 You can also use ``renderer()`` to override existing behavior of how a
 resource with a particular extension is to be included.
