@@ -71,9 +71,12 @@ directory is by registering it with the ``bower`` object::
 
   components = bower.components('components', '/path/to/bower_components')
 
-Since version 0.6, also relavtive paths are accepted::
+Bowerstatic needs an absolute path to the components. With the help of
+a utility function, you can use a path relative to the calling module::
 
-  components = bower.components('components', 'path/relative/to/calling/module')
+  import bowerstatic.utility
+  components = bower.components('components',
+     bowerstatic.utility.module_relative_path('path/relative/to/calling/module'))
 
 You can register multiple ``bower_components`` directories with the
 ``bower`` object. You need to give each a unique name; in the example

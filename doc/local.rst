@@ -73,10 +73,13 @@ name of the component should be unique within the local registry, as
 well as not conflict with any component in the Bower components
 registry.
 
-Since version 0.6, also a relative path can be used for creating a
-local component::
+Bowerstatic needs an absolute path to the local components. With the help of
+a utility function, you can use a path relative to the calling module::
 
-  local.component('path/relative/to/calling/module', version='1.1.0')
+  import bowerstatic.utility
+  components = local.component(
+      bowerstatic.utility.module_relative_path('path/relative/to/calling/module'),
+      version='1.1.0')
 
 ``dependencies`` is also picked up from ``bower.json``, but unlike for
 third party components these dependencies are not automatically
