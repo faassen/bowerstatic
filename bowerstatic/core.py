@@ -82,8 +82,10 @@ class ComponentCollection(object):
 
     def component(self, path, version):
         assert self.fallback_collection is not None
-        self.add(self.load_component(
-            path, 'bower.json', version, version is None))
+        component = self.load_component(
+            path, 'bower.json', version, version is None)
+        self.add(component)
+        return component
 
     def load_components(self, path):
         result = {}
