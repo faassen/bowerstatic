@@ -6,6 +6,9 @@ CHANGES
 
 - Added Python 3 compatibility. Fixes issue #25.
 
+- Bower components and local components can be created based on a path
+  relative to the directory in which the components are created.
+
 - The injector and the publisher can now also be used directly by
   providing a WebOb request and response. Third-party frameworks that
   already use WebOb (such as Morepath and Pyramid) can make use of

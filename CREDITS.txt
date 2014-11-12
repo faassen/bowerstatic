@@ -3,11 +3,13 @@ CREDITS
 
 * Martijn Faassen (creator and main developer)
 
+* Mark Rijken (discussions, module_relative_path)
+
+* Denis Krienbühl (Python 3 compatibility, direct request/response API)
+
 * Ying Zhong (bug reporting)
 
 * Reinout van Rees (a few doc fixes)
-
-* Denis Krienbühl (Python 3 compatibility, direct request/response API)
 
 * Special thanks to the Fanstatic developers.
 
