@@ -3,7 +3,7 @@ CREDITS
 
 * Martijn Faassen (creator and main developer)
 
-* Mark Rijken (discussions, module_relative_path)
+* Marc Rijken (discussions, module_relative_path)
 
 * Denis Krienbühl (Python 3 compatibility, direct request/response API)
 
