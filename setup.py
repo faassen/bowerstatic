@@ -13,7 +13,7 @@ tests_require = [
 
 setup(
     name='bowerstatic',
-    version='0.6',
+    version='0.7.dev0',
     description="A Bower-centric static file server for WSGI",
     long_description=long_description,
     author="Martijn Faassen",
