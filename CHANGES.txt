@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.7 (unreleased)
+0.7 (2014-11-15)
 ================
 
 - The publisher and injector have been refactored into
