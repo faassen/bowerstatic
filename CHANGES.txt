@@ -4,8 +4,14 @@ CHANGES
 0.7 (unreleased)
 ================
 
-- Nothing changed yet.
+- The publisher and injector have been refactored into
+  ``PublisherTween`` and a ``Publisher``, and an ``InjectorTween`` and
+  an ``Injector``. The Tween versions are the ones intended for use by
+  web frameworks that already use WebOb (such as Morepath and Pyramid)
+  as an alternative to using WSGI-based integration.
 
+  The WSGI-based integration has remained unchanged; you can still use
+  ``bower.wrap`` (or ``bower.injector`` and ``bower.publisher``).
 
 0.6 (2014-11-13)
 ================

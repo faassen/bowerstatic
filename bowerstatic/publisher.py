@@ -12,17 +12,17 @@ YEAR_IN_SECONDS = DAY_IN_SECONDS * 365
 FOREVER = YEAR_IN_SECONDS * 10
 
 
-class Publisher(object):
-    def __init__(self, bower, wsgi):
+class PublisherTween(object):
+    def __init__(self, bower, handler):
         self.bower = bower
-        self.wsgi = wsgi
+        self.handler = handler
 
-    def publish(self, request, response):
+    def __call__(self, request):
         # first segment should be publisher signature
         publisher_signature = request.path_info_peek()
         # pass through to underlying WSGI app
         if publisher_signature != self.bower.publisher_signature:
-            return response
+            return self.handler(request)
         request.path_info_pop()
         # next segment is BowerComponents name
         bower_components_name = request.path_info_pop()
@@ -54,6 +54,13 @@ class Publisher(object):
         # XXX do we really want to rely on mimetype guessing?
         return response
 
+
+class Publisher(object):
+    def __init__(self, bower, wsgi):
+        def handler(request):
+            return request.get_response(wsgi)
+        self.tween = PublisherTween(bower, handler)
+
     @webob.dec.wsgify
     def __call__(self, request):
-        return self.publish(request, request.get_response(self.wsgi))
+        return self.tween(request)
