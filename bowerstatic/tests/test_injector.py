@@ -538,7 +538,7 @@ def test_injector_multiple_identical_inclusions_through_dependencies():
         b'</script>\n'
         b'<link rel="stylesheet" type="text/css" '
         b'href="/bowerstatic/components/jquery-ui-bootstrap/0.2.5/'
-        b'jquery.ui.theme.css" />'
+        b'jquery.ui.theme.css">'
         b'</head><body>Hello!</body></html>')
 
 
@@ -606,10 +606,10 @@ def test_injector_PUT_no_effect():
 def test_custom_renderer():
     bower = bowerstatic.Bower()
 
-    def render_foo(url):
-        return '<foo>%s</foo>' % url
+    def render_foo(resource):
+        return '<foo>%s</foo>' % resource.url()
 
-    bower.renderer('.foo', render_foo)
+    bower.register_renderer('.foo', render_foo)
 
     components = bower.components('components', os.path.join(
         os.path.dirname(__file__), 'bower_components'))
@@ -673,3 +673,75 @@ def test_injector_main_unknown_extension():
         b'<html><head><script type="text/javascript" '
         b'src="/bowerstatic/components/unknown_ext_in_main/2.1.1/'
         b'dist/jquery.js"></script></head><body>Hello!</body></html>')
+
+
+def test_injector_custom_renderer_string_format():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery', '<link src="{url}">')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<link src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
+        b'</head><body>Hello!</body></html>')
+
+
+def test_injector_custom_renderer_callable():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def custom_renderer(resource):
+        return '<link src="%s">' % resource.url()
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery', custom_renderer)
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head>'
+        b'<link src="/bowerstatic/components/jquery/2.1.1/dist/jquery.js">'
+        b'</head><body>Hello!</body></html>')
+
+
+def test_injector_inline_renderer():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
+        include = components.includer(environ)
+        include('jquery', bowerstatic.renderer.render_inline_js)
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (
+        b'<html><head><script type="text/javascript">/* jquery.js 2.1.1 */\n'
+        b'</script></head><body>Hello!</body></html>')
+

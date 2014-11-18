@@ -168,6 +168,20 @@ resource with a particular extension is to be included.
 If you include a resource with an unrecognized extension, a
 ``bowerstatic.Error`` is raised.
 
+
+Custom renderer
+---------------
+
+It's also possible to specify the renderer which will be used in an
+included resource::
+
+   include('static/favicon.ico', '<link rel="shortcut icon" type="image/x-icon" href="{url}"/>')
+
+or::
+
+   include('static/favicon.ico', lambda url: '<link rel="shortcut icon" type="image/x-icon" href="' + url + '"/>')
+
+
 URL structure
 -------------
 

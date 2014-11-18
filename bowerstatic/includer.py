@@ -1,5 +1,6 @@
 from .toposort import topological_sort
 from .error import Error
+from .renderer import make_renderer
 
 
 class Includer(object):
@@ -8,14 +9,14 @@ class Includer(object):
         self.components_directory = components_directory
         self.environ = environ
 
-    def __call__(self, path_or_resources):
+    def __call__(self, path_or_resources, renderer=None):
         resources = self.components_directory.path_to_resources(
             path_or_resources)
         if resources is None:
             raise Error("Cannot find component for path (need restart?): %s" %
                         path_or_resources)
         for resource in resources:
-            self.add(ResourceInclusion(resource))
+            self.add(ResourceInclusion(resource, renderer))
 
     def add(self, inclusion):
         inclusions = self.environ.setdefault(
@@ -46,8 +47,9 @@ class Inclusion(object):
 
 
 class ResourceInclusion(Inclusion):
-    def __init__(self, resource):
+    def __init__(self, resource, renderer=None):
         self.resource = resource
+        self.renderer = make_renderer(renderer) if renderer else resource.renderer()
 
     def __repr__(self):
         return ('<bowerstatic.includer.ResourceInclusion for %s>' %
@@ -67,4 +69,4 @@ class ResourceInclusion(Inclusion):
                 for resource in self.resource.dependencies]
 
     def html(self):
-        return self.resource.html()
+        return self.renderer(self.resource)

@@ -7,6 +7,10 @@ class Renderer(object):
         self._renderers = {}
         self.register('.js', render_js)
         self.register('.css', render_css)
+        self.register('.ico', render_favicon)
+        self.register('.gif', render_favicon)
+        self.register('.png', render_favicon)
+        self.register('.jpg', render_favicon)
 
     def register(self, ext, renderer):
         self._renderers[ext] = renderer
@@ -20,17 +24,31 @@ class Renderer(object):
             result.append(path)
         return result
 
-    def html(self, resource):
-        url = resource.url()
+    def renderer(self, resource):
         try:
-            return self._renderers[resource.ext](url)
+            return self._renderers[resource.ext]
         except KeyError:
-            raise Error("Unknown extension for url: %s" % url)
+            raise Error("Unknown extension for url: %s" % resource.url())
 
 
-def render_js(url):
-    return '<script type="text/javascript" src="%s"></script>' % url
+def make_renderer(renderer):
+    if isinstance(renderer, basestring):
+        def string_renderer(resource):
+            return renderer.format(url=resource.url(), content=resource.content())
+        return string_renderer
+
+    if callable(renderer):
+        return renderer
+
+    raise ValueError('Unknow renderer %s' % renderer)
 
 
-def render_css(url):
-    return '<link rel="stylesheet" type="text/css" href="%s" />' % url
+render_js = make_renderer('<script type="text/javascript" src="{url}"></script>')
+
+render_inline_js = make_renderer('<script type="text/javascript">{content}</script>')
+
+render_css = make_renderer('<link rel="stylesheet" type="text/css" href="{url}">')
+
+render_inline_css = make_renderer('<style>{content}</style>')
+
+render_favicon = make_renderer('<link rel="shortcut icon" href="{url}">')

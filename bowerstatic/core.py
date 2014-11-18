@@ -42,11 +42,11 @@ class Bower(object):
     def injector(self, wsgi):
         return Injector(self, wsgi)
 
-    def renderer(self, ext, render_func):
+    def register_renderer(self, ext, render_func):
         self._renderer.register(ext, render_func)
 
-    def html(self, resource):
-        return self._renderer.html(resource)
+    def renderer(self, resource):
+        return self._renderer.renderer(resource)
 
     def filter_by_known_ext(self, paths):
         return self._renderer.filter_by_known_ext(paths)
@@ -264,8 +264,8 @@ class Component(object):
         ]
         return '/' + '/'.join(parts) + '/'
 
-    def html(self, resource):
-        return self.bower.html(resource)
+    def renderer(self, resource):
+        return self.bower.renderer(resource)
 
 
 class Resource(object):
@@ -281,4 +281,11 @@ class Resource(object):
         return self.component.url() + self.file_path
 
     def html(self):
-        return self.component.html(self)
+        return self.renderer(self)
+
+    def content(self):
+        with open(self.component.get_filename(self.component.version, self.file_path)) as f:
+            return f.read()
+
+    def renderer(self):
+        return self.component.renderer(self)
