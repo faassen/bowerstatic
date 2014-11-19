@@ -284,7 +284,8 @@ class Resource(object):
         return self.renderer(self)
 
     def content(self):
-        with open(self.component.get_filename(self.component.version, self.file_path)) as f:
+        with open(self.component.get_filename(
+                self.component.version, self.file_path)) as f:
             return f.read()
 
     def renderer(self):

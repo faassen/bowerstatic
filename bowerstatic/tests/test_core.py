@@ -44,8 +44,9 @@ def test_component_url():
 def test_relative_path_bower_components():
     bower = bowerstatic.Bower()
 
-    components = bower.components('components',
-            bowerstatic.module_relative_path('bower_components'))
+    components = bower.components(
+        'components',
+        bowerstatic.module_relative_path('bower_components'))
 
     assert os.path.join(
         os.path.dirname(__file__), 'bower_components') == components.path
@@ -54,13 +55,14 @@ def test_relative_path_bower_components():
 def test_relative_path_local_components():
     bower = bowerstatic.Bower()
 
-    components = bower.components('components',
-            bowerstatic.module_relative_path('bower_components'))
+    components = bower.components(
+        'components',
+        bowerstatic.module_relative_path('bower_components'))
 
     local = bower.local_components('local', components)
     local_component = local.component(
-            bowerstatic.module_relative_path('local_component'),
-            None)
+        bowerstatic.module_relative_path('local_component'),
+        None)
 
     assert os.path.join(
         os.path.dirname(__file__), 'local_component') == local_component.path

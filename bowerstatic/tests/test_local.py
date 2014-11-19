@@ -370,7 +370,7 @@ def test_local_with_second_auto_version(tmpdir):
 
     before_dt = datetime.now()
 
-    original_url_dt_str, original_url_dt = url_dt_str, url_dt
+    original_url_dt = url_dt
     url_dt_str, url_dt = get_url_dt(response)
     assert url_dt >= after_dt
     assert url_dt <= before_dt

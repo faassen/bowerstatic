@@ -34,7 +34,8 @@ class Renderer(object):
 def make_renderer(renderer):
     if isinstance(renderer, basestring):
         def string_renderer(resource):
-            return renderer.format(url=resource.url(), content=resource.content())
+            return renderer.format(url=resource.url(),
+                                   content=resource.content())
         return string_renderer
 
     if callable(renderer):
@@ -43,12 +44,17 @@ def make_renderer(renderer):
     raise ValueError('Unknow renderer %s' % renderer)
 
 
-render_js = make_renderer('<script type="text/javascript" src="{url}"></script>')
+render_js = make_renderer(
+    '<script type="text/javascript" src="{url}"></script>')
 
-render_inline_js = make_renderer('<script type="text/javascript">{content}</script>')
+render_inline_js = make_renderer(
+    '<script type="text/javascript">{content}</script>')
 
-render_css = make_renderer('<link rel="stylesheet" type="text/css" href="{url}">')
+render_css = make_renderer(
+    '<link rel="stylesheet" type="text/css" href="{url}">')
 
-render_inline_css = make_renderer('<style>{content}</style>')
+render_inline_css = make_renderer(
+    '<style>{content}</style>')
 
-render_favicon = make_renderer('<link rel="shortcut icon" href="{url}">')
+render_favicon = make_renderer(
+    '<link rel="shortcut icon" href="{url}">')

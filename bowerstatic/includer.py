@@ -49,7 +49,8 @@ class Inclusion(object):
 class ResourceInclusion(Inclusion):
     def __init__(self, resource, renderer=None):
         self.resource = resource
-        self.renderer = make_renderer(renderer) if renderer else resource.renderer()
+        self.renderer = (make_renderer(renderer) if renderer
+                         else resource.renderer())
 
     def __repr__(self):
         return ('<bowerstatic.includer.ResourceInclusion for %s>' %

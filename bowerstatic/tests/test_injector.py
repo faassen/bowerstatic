@@ -744,4 +744,3 @@ def test_injector_inline_renderer():
     assert response.body == (
         b'<html><head><script type="text/javascript">/* jquery.js 2.1.1 */\n'
         b'</script></head><body>Hello!</body></html>')
-
