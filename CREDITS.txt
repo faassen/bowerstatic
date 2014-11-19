@@ -7,6 +7,9 @@ CREDITS
 
 * Denis Krienbühl (Python 3 compatibility, direct request/response API)
 
+* mjmare and delijati (@github) for help with Flask integration
+  example.
+
 * Ying Zhong (bug reporting)
 
 * Reinout van Rees (a few doc fixes)

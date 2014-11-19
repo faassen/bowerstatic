@@ -4,8 +4,14 @@ CHANGES
 0.8 (unreleased)
 ================
 
-- Nothing changed yet.
+- Added references to Morepath and Pyramid extensions that integrate
+  BowerStatic.
 
+- Added an example on how to integrate BowerStatic with a Flask
+  application.
+
+- Fixed documentation describing WebOb integration to new reality as of
+  0.7.
 
 0.7 (2014-11-15)
 ================
