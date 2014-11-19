@@ -332,25 +332,91 @@ is equivalent to this::
 
   app = bower.publisher(bower.injector(my_wsgi_app))
 
+Morepath integration
+--------------------
+
+See `static resources with Morepath`_ for information on how the
+`more.static`_ extension helps you use BowerStatic in the `Morepath`_
+web framework.
+
+.. _`static resources with Morepath`: http://morepath.readthedocs.org/en/latest/more.static.html
+
+.. _`more.static`: http://pypi.python.org/pypi/more.static
+
+.. _Morepath: http://morepath.readthedocs.org
+
+Pyramid integration
+-------------------
+
+For integration into the Pyramid_ web framework, there is a `pyramid_bowerstatic`_
+extension.
+
+.. _`pyramid_bowerstatic`: https://pypi.python.org/pypi/pyramid_bowerstatic
+
+.. _Pyramid: http://www.pylonsproject.org/
+
+Example Flask integration
+-------------------------
+
+The Flask_ web framework does not have a specific extension
+integrating BowerStatic yet, but you can use BowerStatic's WSGI
+integration layer to do so.  Here is an example of how you integrate
+BowerStatic with Flask. This code assumes you have a
+``bower_components`` directory next to this module::
+
+    from flask import Flask, request
+    import bowerstatic
+    import os.path
+
+    app = Flask(__name__)
+
+    bower = bowerstatic.Bower()
+
+    components = bower.components(
+       'components',
+        os.path.join(os.path.dirname(__file__), 'bower_components'))
+
+    @app.route('/')
+    def home():
+        include = components.includer(request.environ)
+        include('jquery')
+        # it's important to have head and body elements in the
+        # HTML so the includer has a point to include into
+        return "<html><head></head><body></body></html>'
+
+    if __name__ == "__main__":
+        # wrap app.wsgi_wrap, not the Flask app.
+        app.wsgi_app = bower.wrap(app.wsgi_app)
+        app.run(debug=True)
+
+In the example we used a simple text string but you can use Jinja
+templates too. No special changes to the templates are necessary; the
+only thing required is that they have HTML ``<head>``, ``</head>``,
+``<body>`` and ``</body>`` tags so that the includer has a point where
+it can include the static resources.
+
+.. _Flask: http://flask.pocoo.org/
 
 Using the Publisher and Injector with WebOb
 -------------------------------------------
 
 The ``Injector`` and ``Publisher`` can also directly be used with
 WebOb_ request and response objects. This is useful for integration
-with web frameworks that already use WebOb, such as Morepath_ and
-Pyramid_::
+with web frameworks that already use WebOb::
 
-    injector = bower.injector(wsgi=None)
-    publisher = bower.publisher(wsgi=None)
+    from morepath import InjectorTween, PublisherTween
 
-    response = publisher.publish(request, injector.inject(request, response))
+    def handle(request):
+       ... do application's work, returning response ...
+
+    # use wrapped_handle instead of handle to handle application
+    # requests with BowerStatic support
+    wrapped_handle = PublisherTween(bower, InjectorTween(bower, handle))
 
 All that is required is a WebOb request and a response.
 
+The Morepath and Pyramid integrations mentioned above already make use
+of this API.
+
 .. _WebOb: http://webob.org
-
-.. _Morepath: http://morepath.readthedocs.org
-
-.. _Pyramid: http://www.pylonsproject.org/
 
