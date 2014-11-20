@@ -151,16 +151,43 @@ Supporting additional types of resources
 
 There are all kinds of resource types out there on the web, and
 BowerStatic does not know how to include all of them on a HTML
-page. You can tell the bower object how to handle a new resource type
-like this::
+page. Additional types can be added by making a renderer and
+register that renderer to an extension.
 
-   def render_foo(url):
-       return "<foo>%s</foo>" % url
+Renderers will take a resource and returns a html snippet which will 
+be injected in the HTML head element. Renderers can be defined as a
+callable.
 
-   bower.renderer('.foo', render_foo)
+The callable will need to take the resource as the single argument.
+Based on the resource, the callable can create a html snippet. The
+following attributes of resource are useful for creating the html:
+
+url
+  The url which can be used to load the resource
+
+content
+  The content of the resource, which can used to make
+  an inline resource. This is mainly useful for small
+  resources as it reduces the numbers of http requests
+
+An example::
+
+  def render_foo(resource):
+       return "<foo>%s</foo>" % resource.url
+
+A renderer can be registered to resources types by::
+
+  bower.renderer('.foo', render_foo)
 
 If you now include a resource like ``example.foo``, that resource gets
 included on the web page as ``<foo>/path/to/example.foo</foo>``.
+
+Because most of the times, like above, the html can be constructed
+with a format string, it is also possible to supply a string. Ie::
+
+  bower.renderer('.foo', "<foo>{url}</foo>")
+
+`url` and `content` are available in the string.
 
 You can also use ``renderer()`` to override existing behavior of how a
 resource with a particular extension is to be included.
@@ -173,13 +200,15 @@ Custom renderer
 ---------------
 
 It's also possible to specify the renderer which will be used in an
-included resource::
+included resource, so the renderer of the resource type will be overriden
+just for the given resource. When you specify the renderer, you can
+again do that both as callable and format string::
 
    include('static/favicon.ico', '<link rel="shortcut icon" type="image/x-icon" href="{url}"/>')
 
 or::
 
-   include('static/favicon.ico', lambda url: '<link rel="shortcut icon" type="image/x-icon" href="' + url + '"/>')
+   include('static/favicon.ico', lambda resource: '<link rel="shortcut icon" type="image/x-icon" href="' + resource.url + '"/>')
 
 
 URL structure

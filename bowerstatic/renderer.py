@@ -13,7 +13,7 @@ class Renderer(object):
         self.register('.jpg', render_favicon)
 
     def register(self, ext, renderer):
-        self._renderers[ext] = renderer
+        self._renderers[ext] = make_renderer(renderer)
 
     def filter_by_known_ext(self, paths):
         result = []
@@ -41,20 +41,15 @@ def make_renderer(renderer):
     if callable(renderer):
         return renderer
 
-    raise ValueError('Unknow renderer %s' % renderer)
+    raise ValueError('Unknown renderer %s' % renderer)
 
 
-render_js = make_renderer(
-    '<script type="text/javascript" src="{url}"></script>')
+render_js = '<script type="text/javascript" src="{url}"></script>'
 
-render_inline_js = make_renderer(
-    '<script type="text/javascript">{content}</script>')
+render_inline_js = '<script type="text/javascript">{content}</script>'
 
-render_css = make_renderer(
-    '<link rel="stylesheet" type="text/css" href="{url}">')
+render_css = '<link rel="stylesheet" type="text/css" href="{url}">'
 
-render_inline_css = make_renderer(
-    '<style>{content}</style>')
+render_inline_css = '<style>{content}</style>'
 
-render_favicon = make_renderer(
-    '<link rel="shortcut icon" href="{url}">')
+render_favicon = '<link rel="shortcut icon" href="{url}">'
