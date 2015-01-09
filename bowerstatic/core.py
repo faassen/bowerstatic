@@ -109,7 +109,7 @@ class ComponentCollection(object):
         dependencies = data.get('dependencies')
         if dependencies is None:
             dependencies = {}
-        version = version or data['version']
+        version = version or data.get('version')
         return Component(self.bower,
                          self,
                          path,
