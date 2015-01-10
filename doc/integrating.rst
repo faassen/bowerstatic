@@ -378,7 +378,7 @@ Pyramid integration
 -------------------
 
 For integration into the Pyramid_ web framework, there is a `pyramid_bowerstatic`_
-extension or you can use `djed.static`.
+extension or you can use `djed.static`_.
 
 .. _`pyramid_bowerstatic`: https://pypi.python.org/pypi/pyramid_bowerstatic
 
