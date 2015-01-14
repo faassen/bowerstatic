@@ -90,6 +90,8 @@ class ComponentCollection(object):
     def load_components(self, path):
         result = {}
         for component_path in os.listdir(path):
+            if component_path.startswith('.'):
+                continue
             fullpath = os.path.join(path, component_path)
             if not os.path.isdir(fullpath):
                 continue
