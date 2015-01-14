@@ -210,6 +210,14 @@ or::
 
    include('static/favicon.ico', lambda resource: '<link rel="shortcut icon" type="image/x-icon" href="' + resource.url + '"/>')
 
+Rendering inline
+----------------
+
+In some cases, you may want to render the content of resource directly
+into the web page, instead of referring to it through a URL::
+
+  include('static/something.js', bowerstatic.render_inline_js)
+  include('static/something.css', bowerstatic.render_inline_css)
 
 URL structure
 -------------
