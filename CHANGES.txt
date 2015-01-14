@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-0.8 (unreleased)
+0.8 (2015-01-14)
 ================
 
 - Added references to Morepath and Pyramid extensions that integrate
