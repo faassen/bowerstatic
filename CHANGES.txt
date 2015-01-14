@@ -1,11 +1,10 @@
 CHANGES
 *******
 
-0.9 (unreleased)
-================
+0.8.1 (unreleased)
+==================
 
-- Nothing changed yet.
-
+- Python 3 compatibility fixes: a few things broke with 0.8.
 
 0.8 (2015-01-14)
 ================
