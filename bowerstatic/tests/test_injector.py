@@ -685,7 +685,7 @@ def test_injector_custom_renderer_string_format():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery', '<link src="{url}">')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -711,7 +711,7 @@ def test_injector_custom_renderer_callable():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery', custom_renderer)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
@@ -734,7 +734,7 @@ def test_injector_inline_renderer():
         start_response('200 OK', [('Content-Type', 'text/html;charset=UTF-8')])
         include = components.includer(environ)
         include('jquery', bowerstatic.renderer.render_inline_js)
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
