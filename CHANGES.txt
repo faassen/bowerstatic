@@ -7,6 +7,9 @@ CHANGES
 - Added references to Morepath and Pyramid extensions that integrate
   BowerStatic.
 
+- Don't try to pick up any directories that start with a period (``.``) as
+  bower packages.
+
 - Added an example on how to integrate BowerStatic with a Flask
   application.
 
