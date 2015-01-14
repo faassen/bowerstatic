@@ -1,5 +1,6 @@
 import os
 from .error import Error
+from .compat import string_types
 
 
 class Renderer(object):
@@ -32,7 +33,7 @@ class Renderer(object):
 
 
 def make_renderer(renderer):
-    if isinstance(renderer, basestring):
+    if isinstance(renderer, string_types):
         def string_renderer(resource):
             return renderer.format(url=resource.url(),
                                    content=resource.content())
