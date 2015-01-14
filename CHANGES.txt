@@ -13,10 +13,13 @@ CHANGES
 - Fixed documentation describing WebOb integration to new reality as of
   0.7.
 
-- Format strings can be used as renderer
+- Ability to support custom renderers:
 
-- Renderers will receive the resource in stead of the url. Renderers
-  can be used to render resources inline.
+  http://bowerstatic.readthedocs.org/en/latest/integrating.html#supporting-additional-types-of-resources
+
+- Breaking change: renderers will receive the ``resource`` argument
+  instead of the url. Renderers can be used to render resources
+  inline.
 
 0.7 (2014-11-15)
 ================
