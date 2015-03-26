@@ -173,11 +173,11 @@ content
 An example::
 
   def render_foo(resource):
-       return "<foo>%s</foo>" % resource.url
+       return "<foo>%s</foo>" % resource.url()
 
 A renderer can be registered to resources types by::
 
-  bower.renderer('.foo', render_foo)
+  bower.register_renderer('.foo', render_foo)
 
 If you now include a resource like ``example.foo``, that resource gets
 included on the web page as ``<foo>/path/to/example.foo</foo>``.
@@ -185,11 +185,11 @@ included on the web page as ``<foo>/path/to/example.foo</foo>``.
 Because most of the times, like above, the html can be constructed
 with a format string, it is also possible to supply a string. Ie::
 
-  bower.renderer('.foo', "<foo>{url}</foo>")
+  bower.register_renderer('.foo', "<foo>{url}</foo>")
 
 `url` and `content` are available in the string.
 
-You can also use ``renderer()`` to override existing behavior of how a
+You can also use ``register_renderer()`` to override existing behavior of how a
 resource with a particular extension is to be included.
 
 If you include a resource with an unrecognized extension, a
@@ -208,7 +208,7 @@ again do that both as callable and format string::
 
 or::
 
-   include('static/favicon.ico', lambda resource: '<link rel="shortcut icon" type="image/x-icon" href="' + resource.url + '"/>')
+   include('static/favicon.ico', lambda resource: '<link rel="shortcut icon" type="image/x-icon" href="' + resource.url() + '"/>')
 
 Rendering inline
 ----------------
