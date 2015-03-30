@@ -4,8 +4,7 @@ CHANGES
 0.9 (unreleased)
 ================
 
-- Nothing changed yet.
-
+- A few documentation fixes.
 
 0.8.1 (2015-01-14)
 ==================
