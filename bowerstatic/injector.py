@@ -16,6 +16,7 @@ class InjectorTween(object):
             return response
         if not (response.content_type and
             response.content_type.lower() in CONTENT_TYPES):
+            return response
         inclusions = request.environ.get('bowerstatic.inclusions')
         if inclusions is None:
             return response

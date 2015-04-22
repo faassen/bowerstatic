@@ -744,3 +744,23 @@ def test_injector_inline_renderer():
     assert response.body == (
         b'<html><head><script type="text/javascript">/* jquery.js 2.1.1 */\n'
         b'</script></head><body>Hello!</body></html>')
+
+
+def test_injector_no_content_type_set():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        start_response('200 OK', [])
+        include = components.includer(environ)
+        include('jquery/dist/jquery.js')
+        return [b'SOME-BINARY-OR-NOT-HTML-DATA']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    response = c.get('/')
+    assert response.body == (b'SOME-BINARY-OR-NOT-HTML-DATA')
