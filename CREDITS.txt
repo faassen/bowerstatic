@@ -14,6 +14,10 @@ CREDITS
 
 * Reinout van Rees (a few doc fixes)
 
+* Sebastian Wehrmann (bug fix)
+
+* rnd0101, Roman Prots (bug fix)
+
 * Special thanks to the Fanstatic developers.
 
 * Special thanks to CONTACT software.
