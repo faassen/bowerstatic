@@ -14,8 +14,9 @@ class InjectorTween(object):
         response = self.handler(request)
         if request.method not in METHODS:
             return response
-        if (response.content_type is None or
-            response.content_type.lower() not in CONTENT_TYPES):
+        if response.content_type is None:  # e.g. 401 reponses
+            return response
+        if response.content_type.lower() not in CONTENT_TYPES:
             return response
         inclusions = request.environ.get('bowerstatic.inclusions')
         if inclusions is None:

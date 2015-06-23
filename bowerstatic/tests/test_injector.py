@@ -1,8 +1,9 @@
-import bowerstatic
 from webtest import TestApp as Client
+import bowerstatic
+import json
+import mock
 import os
 import pytest
-import json
 
 
 def test_injector_specific_path():
@@ -47,6 +48,31 @@ def test_injector_specific_path_wrong_file():
     c = Client(injector)
 
     c.get('/')
+
+
+def test_injector_does_not_fail_for_401_responses_with_no_content_type():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    def wsgi(environ, start_response):
+        # Can not use 401 here as webtest only accepts 200 or 3xx, which is ok
+        # as we want to test the behaviour if no content type is given
+        start_response('302', [('Content-Type', None)])
+        include = components.includer(environ)
+        with pytest.raises(bowerstatic.Error):
+            include('jquery/nonexistent.js')
+        return ['<html><head></head><body>Hello!</body></html>']
+
+    injector = bower.injector(wsgi)
+
+    c = Client(injector)
+
+    # webtest checks, in contracy to pyramid, the headers and breaks if one of
+    # them is not a string.
+    with mock.patch('webtest.lint.check_headers'):
+        c.get('/')
 
 
 def test_injector_specific_path_wrong_file_then_added(tmpdir):
