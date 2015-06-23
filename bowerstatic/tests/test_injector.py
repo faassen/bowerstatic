@@ -63,7 +63,7 @@ def test_injector_does_not_fail_for_401_responses_with_no_content_type():
         include = components.includer(environ)
         with pytest.raises(bowerstatic.Error):
             include('jquery/nonexistent.js')
-        return ['<html><head></head><body>Hello!</body></html>']
+        return [b'<html><head></head><body>Hello!</body></html>']
 
     injector = bower.injector(wsgi)
 
