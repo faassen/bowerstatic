@@ -115,7 +115,14 @@ class ComponentCollection(object):
         dependencies = data.get('dependencies')
         if dependencies is None:
             dependencies = {}
-        version = version or data['version']
+        if not version:
+            version = data.get('_release')
+        if not version:
+            try:
+                version = data['version']
+            except KeyError:
+                raise ValueError('Missing _release and version in {}'.format(
+                    path))
         return Component(self.bower,
                          self,
                          path,

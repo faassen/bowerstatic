@@ -217,6 +217,23 @@ def test_local_bower_json_dependencies():
         b'</head><body>Hello!</body></html>')
 
 
+def test_local_with_missing_version():
+    bower = bowerstatic.Bower()
+
+    components = bower.components('components', os.path.join(
+        os.path.dirname(__file__), 'bower_components'))
+
+    local = bower.local_components('local', components)
+
+    path = os.path.join(
+        os.path.dirname(__file__), 'local_component_missing_version')
+
+    with pytest.raises(ValueError) as err:
+        local.component(path, version=None)
+    assert str(err.value).startswith('Missing _release and version in')
+    assert str(err.value).endswith('/tests/local_component_missing_version')
+
+
 # FIXME: strictly speaking Linux ext3 also has a failing bug here,
 # but I don't know how to reliably detect whether the filesystem has
 # only second granularity so this will have to do
