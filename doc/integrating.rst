@@ -182,12 +182,12 @@ A renderer can be registered to resources types by::
 If you now include a resource like ``example.foo``, that resource gets
 included on the web page as ``<foo>/path/to/example.foo</foo>``.
 
-Because most of the times, like above, the html can be constructed
-with a format string, it is also possible to supply a string. Ie::
+Because most of the time, like above, the html can be constructed with
+a format string, it is also possible to supply a string. For example::
 
   bower.register_renderer('.foo', "<foo>{url}</foo>")
 
-`url` and `content` are available in the string.
+You can use `url` and `content` as variables in the format string.
 
 You can also use ``register_renderer()`` to override existing behavior of how a
 resource with a particular extension is to be included.
