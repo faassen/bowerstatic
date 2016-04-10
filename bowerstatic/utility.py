@@ -9,5 +9,5 @@ def module_relative_path(path):
         return path
 
     calling_file = inspect.stack()[1][1]
-    calling_dir = os.path.split(calling_file)[0]
+    calling_dir = os.path.abspath(os.path.dirname(calling_file))
     return os.path.join(calling_dir, path)
