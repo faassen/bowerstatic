@@ -39,8 +39,9 @@ CHANGES
   http://bowerstatic.readthedocs.org/en/latest/integrating.html#supporting-additional-types-of-resources
 
 - Breaking change: renderers will receive the ``resource`` argument
-  instead of the url. Renderers can be used to render resources
-  inline.
+  instead of the url. Use `bower.register_renderer` instead of
+  `bower.renderer` to register a renderer. Renderers can be used to
+  render resources inline.
 
 0.7 (2014-11-15)
 ================
