@@ -18,6 +18,8 @@ CREDITS
 
 * rnd0101, Roman Prots (bug fix)
 
+* Stefano Taschini (bug fix)
+
 * Special thanks to the Fanstatic developers.
 
 * Special thanks to CONTACT software.

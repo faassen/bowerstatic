@@ -6,6 +6,7 @@ CHANGES
 
 - Do not crash when a version information is missing in bower.json.
 
+- Fix to ``module_relative_path`` to make sure it is always absolute.
 
 0.9 (2015-06-23)
 ================
