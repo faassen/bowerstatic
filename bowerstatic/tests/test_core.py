@@ -52,6 +52,17 @@ def test_relative_path_bower_components():
         os.path.dirname(__file__), 'bower_components') == components.path
 
 
+def test_module_relative_path_is_absolute(monkeypatch, tmpdir):
+    monkeypatch.chdir(tmpdir)
+    monkeypatch.syspath_prepend('.')
+
+    with open('example.py', 'wt') as f:
+        f.write("path = __import__('bowerstatic').module_relative_path('bower_components')\n")
+
+    import os, example
+    assert os.path.isabs(example.path)
+
+
 def test_relative_path_local_components():
     bower = bowerstatic.Bower()
 
