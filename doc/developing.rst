@@ -29,7 +29,7 @@ Clone BowerStatic from github_ and go to the ``bowerstatic`` directory::
 Now we need to run ``bootstrap.py`` to set up buildout, using the
 Python from the virtualenv we've created before::
 
-  $ python /path/to/ve_bowerstatic/bin/python/bootstrap.py
+  $ /path/to/ve_bowerstatic/bin/python bootstrap.py
 
 This installs buildout, which can now set up the rest of the development
 environment::
