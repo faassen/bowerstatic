@@ -1,9 +1,10 @@
+import io
 from setuptools import setup, find_packages
 
-long_description = (
-    open('README.rst').read()
-    + '\n' +
-    open('CHANGES.txt').read())
+long_description = '\n'.join((
+    io.open('README.rst', encoding='utf-8').read(),
+    io.open('CHANGES.txt', encoding='utf-8').read()
+))
 
 tests_require = [
     'pytest >= 2.0',
