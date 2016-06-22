@@ -1,11 +1,33 @@
-bin
-.installed.cfg
-parts
-develop-eggs
-.tern-port
-doc/_build
-.tox
-.coverage
-htmlcov
-__pycache__
-*.pyc
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS metadata
+.DS_STORE
+
+# Distribution / packaging
+*.egg-info/
+/build/
+/dist/
+
+# Virtualenv
+/env/
+
+# Buildout
+/bin/
+/develop-eggs/
+/eggs/
+/src/
+/parts/
+/.installed.cfg
+/.mr.developer.cfg
+
+# Unit test / coverage reports
+.cache/
+/.coverage
+/htmlcov
+/.tox
+
+# Sphinx documentation
+/doc/build/
