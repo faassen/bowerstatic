@@ -57,9 +57,11 @@ def test_module_relative_path_is_absolute(monkeypatch, tmpdir):
     monkeypatch.syspath_prepend('.')
 
     with open('example.py', 'wt') as f:
-        f.write("path = __import__('bowerstatic').module_relative_path('bower_components')\n")
+        f.write("path = __import__('bowerstatic')."
+                "module_relative_path('bower_components')\n")
 
-    import os, example
+    import os
+    import example
     assert os.path.isabs(example.path)
 
 

@@ -23,7 +23,7 @@ class InjectorTween(object):
             return response
         body = response.body
         response.body = b''
-        rendered_inclusions = (inclusions.render() + '</head>').encode('utf-8')        
+        rendered_inclusions = (inclusions.render() + '</head>').encode('utf-8')
         body = body.replace(b'</head>', rendered_inclusions)
         response.write(body)
         return response
