@@ -302,8 +302,6 @@ def test_injector_missing_version_bower_components():
         b'</head><body>Hello!</body></html>')
 
 
-
-
 def test_injector_endpoint_multiple_mains():
     bower = bowerstatic.Bower()
 
